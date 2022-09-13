@@ -49,7 +49,7 @@ Route::prefix('anime')->name('anime.')->group(function () {
 	Route::get('latino', [ApiController::class, 'latino']);
 	Route::get('latino2', [ApiController::class, 'latino2']);
 	Route::get('trending', [ApiController::class, 'trending']);
-	Route::get('more-view', [ApiController::class, 'moreWatching']);	
+	Route::get('more-view', [ApiController::class, 'moreView']);	
 	Route::get('search', [ApiController::class, 'search']);
 	Route::get('simulcast', [ApiController::class, 'simulcast']);
 	Route::get('list', [ApiController::class, 'listAnimes']);
