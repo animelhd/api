@@ -73,5 +73,15 @@ class Episode extends Model
 			->where('anime_id',$anime->id)
 			->where('number',$request->episode_number+1)
 			->first();
-    }		
+    }
+
+    //EndPoints App
+    public function getEpisodesList($request)
+    {
+        return $this->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt', 'views as visitas')
+		    ->orderby('episodes.id','desc')
+			->limit($request->limit)
+			->offset($request->offset)
+			->get();
+    }	
 }

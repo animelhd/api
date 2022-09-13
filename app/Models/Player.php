@@ -43,5 +43,17 @@ class Player extends Model
 			->with(['server'])
 			->get()
 			->groupby('languaje');
-    }		
+    }
+
+    //Endpoint App
+	public function getPlayersList($request)
+    {
+        return $this->select('players.id', 'code as link', 'languaje', 'server_id as serverId', 'episode_id as episodeId')
+			->leftJoin('servers','servers.id','=','players.server_id')		
+			->where('status', 0)
+			->orderby('languaje','desc')
+			->limit($request->limit)
+			->offset($request->offset)
+			->get();
+    }	
 }

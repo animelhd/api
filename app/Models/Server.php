@@ -22,4 +22,12 @@ class Server extends Model
     protected $casts = [
         'id' => 'integer',
     ];
+	
+    //EndPoint App
+    public function getServersList()
+    {
+        return $this->select('id', 'title as name', 'position')	
+			->where('status', 0)
+			->get();
+    }	
 }

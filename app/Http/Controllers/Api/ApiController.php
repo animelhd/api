@@ -8,6 +8,7 @@ use App\Models\Anime;
 use App\Models\Genre;
 use App\Models\Episode;
 use App\Models\Player;
+use App\Models\Server;
 use App\Models\User;
 
 use Exception;
@@ -20,7 +21,7 @@ class ApiController extends Controller
     /**
      * model instances.
      */
-    protected $episode, $anime, $genre, $player, $user;	
+    protected $episode, $anime, $genre, $player, $server, $user;	
 
     /**
      * Create a new controller instance.
@@ -30,12 +31,13 @@ class ApiController extends Controller
 	 * @param  \App\Models\Genre;  $genre
      * @return void
      */	
-	public function __construct(Episode $episode, Anime $anime, Genre $genre, Player $player, User $user)
+	public function __construct(Episode $episode, Anime $anime, Genre $genre, Player $player, Server $server, User $user)
 	{
 		$this->episode = $episode;
 		$this->anime = $anime;
 		$this->genre = $genre;
 		$this->player = $player;
+		$this->server = $server;
 		$this->user = $user;
 	}
 	
@@ -430,6 +432,52 @@ class ApiController extends Controller
 	            'status' => false
 	        );
 		}		
+	}
+	
+	//EndPoints App
+	//Lista de Animes EndPoint App Nueva
+	public function getAnimesList(Request $request)
+	{
+		try {
+			return $this->anime->getAnimesList($request);
+		} catch (Exception $e) {
+			return array(
+	            'msg' => $e->getMessage()
+	        );
+		}
+	}
+	//Lista de Episodes EndPoint App Nueva
+	public function getEpisodesList(Request $request)
+	{
+		try {
+			return $this->episode->getEpisodesList($request);
+		} catch (Exception $e) {
+			return array(
+	            'msg' => $e->getMessage()
+	        );
+		}
+	}
+	//Lista de Servers EndPoint App Nueva
+	public function getServersList(Request $request)
+	{
+	    try{
+ 	        return $this->server->getServersList();
+	    }catch(Exception $e){
+	        return array(
+	            'msg' => $e->getMessage()
+	        );
+	    }
+	}
+	//Lista de Players EndPoint App Nueva	
+	public function getPlayersList(Request $request)
+	{
+	    try{
+ 	        return $this->player->getPlayersList($request);
+	    }catch(Exception $e){
+	        return array(
+	            'msg' => $e->getMessage()
+	        );
+	    }
 	}	
 
 	public function config(Request $request)

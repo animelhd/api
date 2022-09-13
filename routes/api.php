@@ -29,6 +29,18 @@ Route::get('/sitemap', [ApiController::class, 'sitemap'])->name('sitemap');
 Route::prefix('app')->name('app.')->group(function () {
 	Route::get('home', [ApiController::class, 'getDataHome']);
     Route::get('anime/{anime_slug}', [ApiController::class, 'getDataAnime']);
+	Route::prefix('animes')->name('animes.')->group(function () {	
+		Route::get('list', [ApiController::class, 'getAnimesList']);
+	});
+	Route::prefix('episodes')->name('episodes.')->group(function () {
+		Route::get('list', [ApiController::class, 'getEpisodesList']);
+	});
+	Route::prefix('servers')->name('servers.')->group(function () {
+		Route::get('list', [ApiController::class, 'getServersList']);
+	});	
+	Route::prefix('players')->name('players.')->group(function () {	
+		Route::get('list', [ApiController::class, 'getPlayersList']);
+	});
 });
 
 // Routes appWeb
