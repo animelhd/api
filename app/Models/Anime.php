@@ -140,7 +140,7 @@ class Anime extends Model
 			->orwhere('genres','LIKE',"%{$request->search}%")
 			->orwhere('aired','LIKE',"%{$request->search}%")
 	        ->orderBy('aired','desc')
-	        ->limit(10)
+	        ->limit(20)
 			->get();
     }	
 	
