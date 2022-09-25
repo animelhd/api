@@ -246,6 +246,33 @@ class ApiController extends Controller
 	        );
 	    }
 	}
+
+	public function getEpisodePlayers(Request $request)
+	{
+	    try{
+	    	$animed = $this->anime->getAnimeEpisodePage($request);
+	    	if(!$animed){
+	            return redirect('404');
+	        }
+	        $episoded = $this->episode->getInfoEpisodePage($request, $animed);
+	        if(!$episoded){
+	            return redirect('404');
+	        }
+			DB::unprepared('update episodes set views = views+1 where id = '.$episoded->id.'');
+	        $anterior = $this->episode->getAnteriorEpisodePage($request, $animed);
+	        $siguiente = $this->episode->getSiguienteEpisodePage($request, $animed);
+	        $episoded->anime = $animed;
+	        $episoded->anterior = $anterior;
+	        $episoded->siguiente = $siguiente;
+	        $players = $this->player->getPlayersEpisodeNew($request, $episoded);
+	        $episoded->players = $players;
+	        return $episoded;
+	    }catch(Exception $e){
+	        return array(
+	            'msg' => $e->getMessage()
+	        );
+	    }
+	}
 	
 	public function sitemap(Request $request){
 		try {
@@ -337,7 +364,7 @@ class ApiController extends Controller
 	public function listFavoriteAnime(Request $request){
 		try {
 			$user = $this->user::find($request->user_id);
-			$data = $user->getFavoriteItems(Anime::class)->select('id','slug','poster')->get();
+			$data = $user->getFavoriteItems(Anime::class)->select('id','slug','poster')->orderBy('name','asc')->get();
 			return $data;
 		} catch (Exception $e) {
 			return array(
@@ -381,7 +408,7 @@ class ApiController extends Controller
 	public function listViewAnime(Request $request){
 		try {
 			$user = $this->user::find($request->user_id);
-			$data = $user->getViewItems(Anime::class)->select('id','slug','poster')->get();
+			$data = $user->getViewItems(Anime::class)->select('id','slug','poster')->orderBy('name','asc')->get();
 			return $data;
 		} catch (Exception $e) {
 			return array(
@@ -425,7 +452,7 @@ class ApiController extends Controller
 	public function listWatchingAnime(Request $request){
 		try {
 			$user = $this->user::find($request->user_id);
-			$data = $user->getWatchingItems(Anime::class)->select('id','slug','poster')->get();
+			$data = $user->getWatchingItems(Anime::class)->select('id','slug','poster')->orderBy('name','asc')->get();
 			return $data;
 		} catch (Exception $e) {
 			return array(
@@ -433,7 +460,7 @@ class ApiController extends Controller
 	        );
 		}		
 	}
-	
+
 	//EndPoints App
 	//Lista de Animes EndPoint App Nueva
 	public function getAnimesList(Request $request)
@@ -478,7 +505,7 @@ class ApiController extends Controller
 	            'msg' => $e->getMessage()
 	        );
 	    }
-	}	
+	}
 
 	public function config(Request $request)
 	{

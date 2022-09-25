@@ -20,9 +20,38 @@ class StreamController extends Controller
 
 	public function getStream(Request $request)
 	{
-		$player = Player::where('id',$request->id)->with('server')->first();
-		$data = ['player' => $player];
-		return view('stream.video')->with($data);
+        try {
+
+            $referer = $_SERVER['HTTP_REFERER'] ?? null;
+            $parse = parse_url($referer);
+            if($parse['host'] != 'www.animelatinohd.com')
+                throw new Exception('Sin Acceso');
+
+            $player = Player::where('id',$request->id)->with('server')->first();
+
+            if(!$player)
+                throw new Exception('No encontrado');
+
+            switch ($player->server->type) {
+                case '0':
+                    $data = ['player' => $player];
+                    return view('stream.video')->with($data);
+                    break;
+                case '1':
+                    return redirect($player->code);
+                    break;
+                case '2':
+                    return redirect($player->code);
+                    break;
+                default:
+                    return redirect($player->code);
+                    break;
+            }
+            
+        } catch (\Exception $e) {
+            abort(403);
+        }
+		
 	}
 	
 	
@@ -492,5 +521,5 @@ class StreamController extends Controller
             );
 	    }
 	}
-	
+    
 }

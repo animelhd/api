@@ -35,7 +35,7 @@
                                     <td>{{ $server->title }}</td>
                                     <td>{{ $server->embed }}</td>
                                     <td><span class="badge outline-badge-{{ $server->type == 0 ? 'success' : ( $server->type == 1 ? 'info' : 'warning' ) }}">{{ $server->type == 0 ? __('Direct Link') : ($server->type == 1 ? __('Iframe') : __('Generated')) }}</span></td>
-                                    <td><span class="badge outline-badge-{{ $server->status == 0 ? 'success' : 'danger' }}">{{ $server->status == 0 ? __('Online') : __('Offline') }}</span></td>
+                                    <td><span class="badge outline-badge-{{ $server->status == 0 ? 'danger' : ( $server->status == 1 ? 'success' : ( $server->status == 2 ? 'info' : 'warning' ) )  }}">{{ $server->status == 0 ? __('Offline') : ( $server->status == 1 ? __('Online') : ( $server->status == 2 ? __('Only Web') : __('Only App') ) )  }}</span></td>
                                     <td class="text-center">
 									<ul class="table-controls">
 										<li>

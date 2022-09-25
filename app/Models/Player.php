@@ -45,6 +45,15 @@ class Player extends Model
 			->groupby('languaje');
     }
 
+    public function getPlayersEpisodeNew($request, $episode)
+    {
+        return $this->select('id','languaje','server_id')
+			->where('episode_id',$episode->id)
+			->with(['server'])
+			->get()
+			->groupby('languaje');
+    }
+    
     //Endpoint App
 	public function getPlayersList($request)
     {
@@ -55,5 +64,5 @@ class Player extends Model
 			->limit($request->limit)
 			->offset($request->offset)
 			->get();
-    }	
+    }
 }
