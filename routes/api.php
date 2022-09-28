@@ -55,6 +55,7 @@ Route::prefix('anime')->name('anime.')->group(function () {
 	Route::get('list', [ApiController::class, 'listAnimes']);
 	Route::get('{anime_slug}', [ApiController::class, 'getAnime']);
 	Route::get('{anime_slug}/episodes', [ApiController::class, 'getAnimeEpisodes']);
+	Route::get('{anime_slug}/episodes/{episode_number}', [ApiController::class, 'getEpisodePlayers']);
 	Route::get('{anime_slug}/recommendations', [ApiController::class, 'getAnimeRecommendations']);
 });
 Route::prefix('episodes')->name('episodes.')->group(function () {
