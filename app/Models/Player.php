@@ -43,7 +43,7 @@ class Player extends Model
 			->where('episode_id',$episode->id)
 			->where(function ($query) {
 				$query->where('status', 1)
-					  ->orWhere('status', 2);
+					  ->orWhere('status', 3);
 			})
 			->with(['server'])
 			->get()
