@@ -38,8 +38,13 @@ class Player extends Model
 	
 	public function getPlayersEpisode($request, $episode)
     {
-        return $this->select('id','code','languaje','server_id')
+        return $this->select('players.id','code','languaje','server_id')
+			->leftJoin('servers','servers.id','=','players.server_id')
 			->where('episode_id',$episode->id)
+			->where(function ($query) {
+				$query->where('status', 1)
+					  ->orWhere('status', 2);
+			})
 			->with(['server'])
 			->get()
 			->groupby('languaje');
@@ -47,8 +52,13 @@ class Player extends Model
 
     public function getPlayersEpisodeNew($request, $episode)
     {
-        return $this->select('id','languaje','server_id')
+        return $this->select('players.id','languaje','server_id')
+			->leftJoin('servers','servers.id','=','players.server_id')
 			->where('episode_id',$episode->id)
+			->where(function ($query) {
+				$query->where('status', 1)
+					  ->orWhere('status', 2);
+			})
 			->with(['server'])
 			->get()
 			->groupby('languaje');
