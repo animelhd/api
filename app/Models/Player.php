@@ -67,10 +67,13 @@ class Player extends Model
     //Endpoint App
 	public function getPlayersList($request)
     {
-        return $this->select('players.id', 'code as link', 'languaje', 'server_id as serverId', 'episode_id as episodeId')
+        return $this->select('players.id', 'code as link', 'languaje', 'embed', 'server_id as serverId', 'episode_id as episodeId')
 			->leftJoin('servers','servers.id','=','players.server_id')		
-			->where('status', 0)
-			->orderby('languaje','desc')
+			->where(function ($query) {
+				$query->where('status', 1)
+					  ->orWhere('status', 3);
+			})
+			->orderby('players.id','desc')
 			->limit($request->limit)
 			->offset($request->offset)
 			->get();

@@ -27,7 +27,6 @@ class Server extends Model
     public function getServersList()
     {
         return $this->select('id', 'title as name', 'position')	
-			->where('status', 0)
 			->get();
     }	
 }

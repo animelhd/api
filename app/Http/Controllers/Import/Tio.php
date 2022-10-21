@@ -146,14 +146,14 @@ class Tio extends Controller
     public function getServerName($name){
         switch(strtolower($name)){
             case 'fembed':
-                return 'Alpha';
+                return 'AlphaM';
             case 'umi':
             case 'streamium':
                 return 'none';				
             case 'mega':
-                return 'GammaT';
-            case 'okru':
                 return 'none';
+            case 'okru':
+                return 'Zeta';
             default :
                 return $name;
         }

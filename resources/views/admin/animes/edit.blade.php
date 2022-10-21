@@ -195,71 +195,114 @@ $(".genres").select2({
     let ratingDB=[[["G - All Ages","Todas las edades"]],[["PG - Children","Niños"]],[["PG-13 - Teens 13 or older","Adolescentes de 13 años o más"]],[["R - 17+ (violence & profanity)","Adolescentes de 17 años o más (Violencia)"]],[["R+ - Mild Nudity","Solo adultos (Desnudos)"]],[["Rx - Hentai","No se permiten niños"]]];
     let genresDB=[[["Action","accion"]],[["Adventure","aventura"]],[["Cars","autos"]],[["Comedy","comedia"]],[["Dementia","demecia"]],[["Demons","demonios"]],[["Drama","drama"]],[["Ecchi","ecchi"]],[["Fantasy","fantasia"]],[["Game","juegos"]],[["Harem","harem"]],[["Hentai","hentai"]],[["Historical","historico"]],[["Horror","horror"]],[["Josei","josei"]],[["Kids","ninos"]],[["Magic","magia"]],[["Martial Arts","artes-marciales"]],[["Mecha","mecha"]],[["Military","militar"]],[["Music","musica"]],[["Mystery","misterio"]],[["Parody","parodia"]],[["Police","policial"]],[["Psychological","psicologico"]],[["Romance","romance"]],[["Samurai","samurai"]],[["School","escolar"]],[["Sci-Fi","ciencia-ficcion"]],[["Seinen","seinen"]],[["Shoujo","shoujo"]],[["Shoujo Ai","shoujo-ai"]],[["Shounen","shounen"]],[["Shounen Ai","shounen-ai"]],[["Slice of Life","recuentos-de-la-vida"]],[["Space","espacio"]],[["Sports","deportes"]],[["Super Power","super-poderes"]],[["Supernatural","sobrenatural"]],[["Thriller","terror"]],[["Vampire","vampiros"]],[["Yaoi","yaoi"]],[["Yuri","yuri"]]];
     let name = '{{ $anime->name }}';
-	fetch('https://api.jikan.moe/v3/search/anime?q='+name)
+	fetch('https://api.jikan.moe/v4/anime?q='+name)
   	.then(response => response.json())
   	.then(data => {
   		var items = '';
-  		$.each(data.results, function(key,value){
+  		$.each(data.data, function(key,value){
 			items += '<div class="col-12 col-sm-6 p-1"><a onclick="generateData(\'' + value.mal_id + '\')">';
-			items += '<div class="card generado"><div class="year">'+value?.start_date?.slice(0,4)+'</div><input type="submit" class="btn add" value="'+value?.type+'" name="generar"><img class="w-100 img-thumbnail" src="'+value?.image_url+'"><div class="name"><p class="text-truncate m-0">'+value?.title+'</p></div></div></a></div>'
+			items += '<div class="card generado"><div class="year">'+value?.aired?.from?.slice(0,4)+'</div><input type="submit" class="btn add" value="'+value?.type+'" name="generar"><img class="w-100 img-thumbnail" src="'+value?.images?.jpg?.image_url+'"><div class="name"><p class="text-truncate m-0">'+value?.title+'</p></div></div></a></div>'
   		});
 		$("#results").html(items);
 	})
 	function generateData(id) {
-        fetch('https://api.jikan.moe/v3/anime/'+id)
+        fetch('https://api.jikan.moe/v4/anime/'+id+'/full')
       	.then(response => response.json())
       	.then(data => {
-			document.getElementById("name").value = data?.title;
-			let title_alt = [data?.title_japanese, data?.title_english, data?.title_synonyms[0]];
-			var filtered = title_alt.filter(function(el) {
+
+			//Titulo Anime
+			const name = data?.data?.title;
+			document.getElementById("name").value = name;
+			
+			//Titulos Alternativos Anime
+			let titles = [data?.data?.title_japanese, data?.data?.title_english, ...data?.data?.title_synonyms];
+			titles = titles.filter(function(el) {
 				return el != null;
 			});
-			title_alt = filtered;
-			let genresSel = [];
-			data?.genres?.forEach(element => {
-			    let encontrado = genresDB.find(el => el[0][0] == element.name);
-			    if(encontrado){
-					genresSel.push(encontrado[0][1]);
+			document.getElementById("name_alternative").value = titles;
+
+			//Tipo Anime
+			const type = data?.data?.type;
+			document.getElementById("type").value = type;
+
+			//Estado Anime
+			const status = data?.data?.airing === true ? 1 : 0;
+			document.getElementById("status").value = status;
+
+			//Estreno Anime
+			const aired = data?.data?.aired?.from?.slice(0,10);
+			document.getElementById("aired").value = aired;
+
+			//Temporada Anime
+			const str = data?.data?.season+" "+data?.data?.year;
+			const premiered = str.charAt(0).toUpperCase() + str.slice(1);
+			document.getElementById("premiered").value = premiered;
+
+			//Dia de Estreno Anime              ***Sin Funcionar***
+			// var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+			// let stringDate = data?.data?.broadcast?.string;
+			// let DateFormat = '';
+			// let dayNameDate = '';
+			// let HourDate = '';
+			// if(stringDate){
+			// 	DateFormat = stringDate.split(" at ");
+			// 	dayNameDate = DateFormat[0];
+			// 	dayNameDate = dayNameDate.substring(0, dayNameDate.length - 1);
+			// 	HourDate = DateFormat[1].split(' (JST)');
+			// 	HourDate = HourDate[0].split(':');
+			// 	HourDate = HourDate[0];
+			// 	if(HourDate > 14){
+			// 		document.getElementById("broadcast").selectedIndex = days.indexOf(dayNameDate);
+			// 	}else{
+			// 		document.getElementById("broadcast").selectedIndex = (days.indexOf(dayNameDate) - 1) == -1 ? 6 : days.indexOf(dayNameDate) - 1;
+			// 	}
+			// }
+
+			//Generos Anime
+			let genres = [];
+			data?.data?.genres?.forEach(genre => {
+			    let findGenre = genresDB.find(gene => gene[0][0] == genre.name);
+				if(!findGenre){
+					return;
 				}
+				genres.push(findGenre[0][1]);
 			});
-			data?.themes?.forEach(element => {
-			    let encontrado = genresDB.find(el => el[0][0] == element.name);
-			    if(encontrado){
-					genresSel.push(encontrado[0][1]);
+			data?.data?.themes?.forEach(genre2 => {
+			    let findGenre2 = genresDB.find(gene2 => gene2[0][0] == genre2.name);
+				if(!findGenre2){
+					return;
 				}
-			});			
-			$('.genres').val(genresSel).trigger('change');
-			let ratingSel = ratingDB.find(el => el[0][0] == data?.rating);
-			if(data?.trailer_url){
-				document.getElementById("trailer").value = data?.trailer_url;
-			}
-			document.getElementById("name_alternative").value = title_alt;
-      		document.getElementById("aired").value = data?.aired?.from?.slice(0,10);
-      		document.getElementById("status").selectedIndex = data?.airing === true ? 0 : 1;
-      		document.getElementById("type").value = data?.type;
-			document.getElementById("premiered").value = data?.premiered;			  
-      		document.getElementById("rating").value = ratingSel ? ratingSel[0][1] : 'Sin definir';
-      		document.getElementById("popularity").value = data?.popularity;
-      		document.getElementById("vote_average").value = data?.score;
-			var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-			let stringDate = data?.broadcast;
-			let DateFormat = '';
-			let dayNameDate = '';
-			let HourDate = '';
-			if(stringDate){
-				DateFormat = stringDate.split(" at ");
-				dayNameDate = DateFormat[0];
-				dayNameDate = dayNameDate.substring(0, dayNameDate.length - 1);
-				HourDate = DateFormat[1].split(' (JST)');
-				HourDate = HourDate[0].split(':');
-				HourDate = HourDate[0];
-				if(HourDate > 14){
-					document.getElementById("broadcast").selectedIndex = days.indexOf(dayNameDate);
-				}else{
-					document.getElementById("broadcast").selectedIndex = (days.indexOf(dayNameDate) - 1) == -1 ? 6 : days.indexOf(dayNameDate) - 1;
+				genres.push(findGenre2[0][1]);
+			});
+			data?.data?.demographics?.forEach(genre3 => {
+			    let findGenre3 = genresDB.find(gene3 => gene3[0][0] == genre3.name);
+				if(!findGenre3){
+					return;
 				}
+				genres.push(findGenre3[0][1]);
+			});
+			$('.genres').val(genres).trigger('change');
+
+			//Clasificación Anime
+			let rating = ratingDB.find(rt => rt[0][0] == data?.data?.rating);
+			if(rating){
+				document.getElementById("rating").value = rating[0][1];
+			}else{
+				document.getElementById("rating").value = 'No definido';
 			}
-			
+
+			//Popularidad Anime
+			let popularity = data?.data?.popularity;
+			document.getElementById("popularity").value = popularity;
+
+			//Promedio Votos Anime
+			let vote_average = data?.data?.score;
+			document.getElementById("vote_average").value = vote_average;
+
+			//Youtube Trailer Anime
+			let trailer = data?.data?.trailer?.embed_url;
+			document.getElementById("trailer").value = trailer;
+      	
       		$('#exampleModal').modal('hide');
     	})
     }
