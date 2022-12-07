@@ -273,6 +273,21 @@ class ApiController extends Controller
 	        );
 	    }
 	}
+
+	public function setViewsAnime(Request $request)
+	{
+	    try{
+	    	$animedi = $this->anime->getAnimeId($request);
+			//DB::unprepared('update animes set views = '.$animedi->totalviews.' where id = '.$animedi->id.'');
+			return array(
+				'status' => true,
+			);
+	    }catch(Exception $e){
+	        return array(
+	            'msg' => $e->getMessage()
+	        );
+	    }
+	}
 	
 	public function sitemap(Request $request){
 		try {
@@ -319,9 +334,22 @@ class ApiController extends Controller
 		}		
 	}
 
+	public function getRegister(Request $request) {
+		try {
+			return $this->user->register($request);
+		} catch (Exception $e) {
+			return array(
+	            'msg' => $e->getMessage()
+	        );
+		}			
+	}
+
 	public function logoutUser(Request $request){
 		try {
-			return $this->user->logout($request);
+			return array(
+				'code' => 200,
+	            'status' => $this->user->logout($request)
+	        );
 		} catch (Exception $e) {
 			return array(
 	            'msg' => $e->getMessage()
@@ -364,7 +392,7 @@ class ApiController extends Controller
 	public function listFavoriteAnime(Request $request){
 		try {
 			$user = $this->user::find($request->user_id);
-			$data = $user->getFavoriteItems(Anime::class)->select('id','name','slug','poster')->orderBy('name','asc')->get();
+			$data = $user->getFavoriteItems(Anime::class)->select('id','name','slug','poster', 'isTopic')->orderBy('name','asc')->get();
 			return $data;
 		} catch (Exception $e) {
 			return array(
@@ -408,7 +436,7 @@ class ApiController extends Controller
 	public function listViewAnime(Request $request){
 		try {
 			$user = $this->user::find($request->user_id);
-			$data = $user->getViewItems(Anime::class)->select('id','name','slug','poster')->orderBy('name','asc')->get();
+			$data = $user->getViewItems(Anime::class)->select('id','name','slug','poster', 'isTopic')->orderBy('name','asc')->get();
 			return $data;
 		} catch (Exception $e) {
 			return array(
@@ -452,7 +480,7 @@ class ApiController extends Controller
 	public function listWatchingAnime(Request $request){
 		try {
 			$user = $this->user::find($request->user_id);
-			$data = $user->getWatchingItems(Anime::class)->select('id','name','slug','poster')->orderBy('name','asc')->get();
+			$data = $user->getWatchingItems(Anime::class)->select('id','name','slug','poster', 'isTopic')->orderBy('name','asc')->get();
 			return $data;
 		} catch (Exception $e) {
 			return array(
@@ -507,9 +535,31 @@ class ApiController extends Controller
 	    }
 	}
 
+	public function getTokenApp(Request $request){
+		try {
+			return $this->user->getTokenApp($request);
+		} catch (Exception $e) {
+			return array(
+	            'msg' => $e->getMessage()
+	        );
+		}		
+	}  
+
 	public function config(Request $request)
 	{
-		if($request->get('v') == '3.1.1'){
+		if($request->get('v') == '3.2.1'){
+			return array(
+				'status' => true,
+			);
+		}else if($request->get('v') == '3.2.0'){
+			return array(
+				'status' => true,
+			);
+		}else if($request->get('v') == '3.1.4'){
+			return array(
+				'status' => false,
+			);
+		}else if($request->get('v') == '3.1.1'){
 			return array(
 				'videos' => false,
 				'imagenes' => false,

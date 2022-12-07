@@ -174,7 +174,16 @@ class Anime extends Model
         return $this->select('id','name','slug','banner','poster')
 			->where('slug',$request->anime_slug)			
 			->first();
-    }	
+    }
+
+	public function getAnimeId($request)
+    {
+        return $this->select('animes.id', 'animes.views', \DB::raw("sum(episodes.views) as totalviews"))
+			->leftJoin('episodes','episodes.anime_id','=','animes.id')
+			->where('animes.id',$request->id)	
+			->groupBy('animes.id')		
+			->first();
+    }
 
 	/**
      * Filtros
@@ -229,7 +238,7 @@ class Anime extends Model
 	//EndPoints App
 	public function getAnimesList($request)
     {
-        return $this->select('id', 'name', 'name_alternative as nameAlternative', 'slug', 'banner as imagenCapitulo', 'poster as imagen', 'overview', \DB::raw("Date(aired) as aired"), 'type', 'status', 'genres', 'rating', 'trailer', 'vote_average as voteAverage', 'views as visitas')
+        return $this->select('id', 'name', 'name_alternative as nameAlternative', 'slug', 'banner as imagenCapitulo', 'poster as imagen', 'overview', \DB::raw("Date(aired) as aired"), 'type', 'status', 'genres', 'rating', 'trailer', 'vote_average as voteAverage', 'views as visitas', 'isTopic')
 			->orderBy('aired','desc')
 			->get();
 	}

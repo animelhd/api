@@ -73,7 +73,7 @@ class Player extends Model
 				$query->where('status', 1)
 					  ->orWhere('status', 3);
 			})
-			->orderby('players.id','desc')
+			->orderby('episode_id','desc')
 			->limit($request->limit)
 			->offset($request->offset)
 			->get();

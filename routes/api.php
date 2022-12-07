@@ -41,6 +41,7 @@ Route::prefix('app')->name('app.')->group(function () {
 	Route::prefix('players')->name('players.')->group(function () {	
 		Route::get('list', [ApiController::class, 'getPlayersList']);
 	});
+	Route::get('views-anime/{id}', [ApiController::class, 'setViewsAnime']);
 });
 
 // Routes appWeb
@@ -74,7 +75,9 @@ Route::get('config', [ApiController::class, 'config']);
 // Authenticate User
 Route::prefix('auth')->name('auth.')->group(function () {
 	Route::post('token', [ApiController::class, 'getTokenLogin']);
+	Route::post('tokenApp', [ApiController::class, 'getTokenApp']);
     Route::post('register', [RegisteredUserController::class, 'store']);
+	Route::post('registerApp', [ApiController::class, 'getRegister']);
 	Route::middleware('auth:sanctum')->group(function () {
 		Route::get('user', [ApiController::class, 'loginUser']);
 		Route::get('logout', [ApiController::class, 'logoutUser']);

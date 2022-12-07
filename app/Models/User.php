@@ -66,6 +66,67 @@ class User extends Authenticatable
         return $user->createToken($request->device_name)->plainTextToken;
     }
 
+    public function getTokenApp($request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+            'device_name' => 'required',
+        ]);
+        $user = $this->where('email', $request->email)->first();
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return array(
+				'code' => 400,
+                'msg' => 'Usuario y/o contraseña incorrectos.'
+            );
+        } else {
+            return array(
+				'code' => 200,
+                'token' => $user->createToken($request->device_name)->plainTextToken,
+				'user' => $user
+            );
+		}
+    }
+
+    public function register($request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255',
+            'password' => 'required|string|confirmed|min:7',
+        ]);
+        
+        $email = $this->where('email', $request->email)->first();
+        $name = $this->where('name', $request->name)->first();
+
+        if($email && $name) {
+            return array(
+				'code' => 400,
+                'msg' => 'Este Email y Username ya estan en uso'
+            );
+        } else if($email) {
+            return array(
+				'code' => 400,
+                'msg' => 'Este Email ya esta en uso'
+            );            
+        } else if($name) {
+            return array(
+				'code' => 400,
+                'msg' => 'Este Username ya esta en uso'
+            );
+        } else {
+            User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+            return array(
+                'code' => 200,
+                'msg' => 'Registro Exitoso'
+            );
+        }
+    } 
+
     public function login($request)
     {
         return $request->user();
@@ -73,7 +134,7 @@ class User extends Authenticatable
 
     public function logout($request)
     {
-        return $request->user()->tokens()->delete();
+        return $request->user()->currentAccessToken()->delete();
     }
 
 }
