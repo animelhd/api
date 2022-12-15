@@ -79,6 +79,7 @@ class Episode extends Model
     public function getEpisodesList($request)
     {
         return $this->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt', 'views as visitas')
+            ->where('id', '>=', 18243)	
 		    ->orderby('episodes.id','desc')
 			->limit($request->limit)
 			->offset($request->offset)

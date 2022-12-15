@@ -547,7 +547,11 @@ class ApiController extends Controller
 
 	public function config(Request $request)
 	{
-		if($request->get('v') == '3.2.1'){
+		if($request->get('v') == '3.2.2'){
+			return array(
+				'status' => true,
+			);
+		}else if($request->get('v') == '3.2.1'){
 			return array(
 				'status' => true,
 			);

@@ -30,18 +30,22 @@ Route::prefix('app')->name('app.')->group(function () {
 	Route::get('home', [ApiController::class, 'getDataHome']);
     Route::get('anime/{anime_slug}', [ApiController::class, 'getDataAnime']);
 	Route::prefix('animes')->name('animes.')->group(function () {	
-		Route::get('list', [ApiController::class, 'getAnimesList']);
+		Route::get('list3', [ApiController::class, 'getAnimesList'])->middleware(['throttle:animes']);
+		//Route::get('list2', [ApiController::class, 'getAnimesList'])->middleware(['throttle:animes']);
 	});
 	Route::prefix('episodes')->name('episodes.')->group(function () {
-		Route::get('list', [ApiController::class, 'getEpisodesList']);
+		Route::get('list3', [ApiController::class, 'getEpisodesList'])->middleware(['throttle:episodes']);
+		//Route::get('list2', [ApiController::class, 'getEpisodesList'])->middleware(['throttle:episodes']);
 	});
 	Route::prefix('servers')->name('servers.')->group(function () {
-		Route::get('list', [ApiController::class, 'getServersList']);
+		Route::get('list3', [ApiController::class, 'getServersList'])->middleware(['throttle:servers']);
+		//Route::get('list2', [ApiController::class, 'getServersList'])->middleware(['throttle:servers']);
 	});	
 	Route::prefix('players')->name('players.')->group(function () {	
-		Route::get('list', [ApiController::class, 'getPlayersList']);
+		Route::get('list3', [ApiController::class, 'getPlayersList'])->middleware(['throttle:players']);
+		//Route::get('list2', [ApiController::class, 'getPlayersList'])->middleware(['throttle:players']);
 	});
-	Route::get('views-anime/{id}', [ApiController::class, 'setViewsAnime']);
+	//Route::get('views-anime/{id}', [ApiController::class, 'setViewsAnime']);
 });
 
 // Routes appWeb

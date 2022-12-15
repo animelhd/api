@@ -239,6 +239,7 @@ class Anime extends Model
 	public function getAnimesList($request)
     {
         return $this->select('id', 'name', 'name_alternative as nameAlternative', 'slug', 'banner as imagenCapitulo', 'poster as imagen', 'overview', \DB::raw("Date(aired) as aired"), 'type', 'status', 'genres', 'rating', 'trailer', 'vote_average as voteAverage', 'views as visitas', 'isTopic')
+			->where('id', '>=', 865)	
 			->orderBy('aired','desc')
 			->get();
 	}

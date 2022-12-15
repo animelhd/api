@@ -68,7 +68,8 @@ class Player extends Model
 	public function getPlayersList($request)
     {
         return $this->select('players.id', 'code as link', 'languaje', 'embed', 'server_id as serverId', 'episode_id as episodeId')
-			->leftJoin('servers','servers.id','=','players.server_id')		
+			->leftJoin('servers','servers.id','=','players.server_id')
+            ->where('episode_id', '>=', 18243)	
 			->where(function ($query) {
 				$query->where('status', 1)
 					  ->orWhere('status', 3);
