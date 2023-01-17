@@ -23,8 +23,8 @@ class Anime extends Model
      * @var array
      */
     protected $guarded = [];
-	public $timestamps = false; 
-	public $updated_at = false;
+	public $timestamps = true; 
+	public $updated_at = true;
 
 
     /**
@@ -178,7 +178,7 @@ class Anime extends Model
 
 	public function getAnimeId($request)
     {
-        return $this->select('animes.id', 'animes.views', \DB::raw("sum(episodes.views) as totalviews"))
+        return $this->select('animes.id', 'animes.views', \DB::raw("sum(episodes.views_app) as totalviews"))
 			->leftJoin('episodes','episodes.anime_id','=','animes.id')
 			->where('animes.id',$request->id)	
 			->groupBy('animes.id')		
@@ -236,10 +236,20 @@ class Anime extends Model
     }
 	
 	//EndPoints App
-	public function getAnimesList($request)
+	public function getAnimesRecentList()
     {
         return $this->select('id', 'name', 'name_alternative as nameAlternative', 'slug', 'banner as imagenCapitulo', 'poster as imagen', 'overview', \DB::raw("Date(aired) as aired"), 'type', 'status', 'genres', 'rating', 'trailer', 'vote_average as voteAverage', 'views as visitas', 'isTopic')
-			->where('id', '>=', 865)	
+			->where('id', '>=', 903)
+			->where('id', '<=', 957)	
+			->orderBy('aired','desc')
+			->get();
+	}
+
+	public function getAnimesList($request)
+    {
+		return $this->select('id', 'name', 'name_alternative as nameAlternative', 'slug', 'banner as imagenCapitulo', 'poster as imagen', 'overview', \DB::raw("Date(aired) as aired"), 'type', 'status', 'genres', 'rating', 'trailer', 'vote_average as voteAverage', 'views as visitas', 'isTopic')	
+			->where('updated_at', '>=', '2023-01-05 13:48:29')
+			->where('id', '<=', 945)
 			->orderBy('aired','desc')
 			->get();
 	}

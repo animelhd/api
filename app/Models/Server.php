@@ -26,7 +26,8 @@ class Server extends Model
     //EndPoint App
     public function getServersList()
     {
-        return $this->select('id', 'title as name', 'position')	
+        return $this->select('id', 'title as name', 'position', 'embed')	
 			->get();
-    }	
+    }
+    
 }

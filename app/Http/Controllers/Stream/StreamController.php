@@ -22,10 +22,10 @@ class StreamController extends Controller
 	{
         try {
 
-            $referer = $_SERVER['HTTP_REFERER'] ?? null;
-            $parse = parse_url($referer);
-            if($parse['host'] != 'www.animelatinohd.com')
-                throw new Exception('Sin Acceso');
+            // $referer = $_SERVER['HTTP_REFERER'] ?? null;
+            // $parse = parse_url($referer);
+            // if($parse['host'] != 'www.animelatinohd.com')
+            //     throw new Exception('Sin Acceso');
 
             $player = Player::where('id',$request->id)->with('server')->first();
 
@@ -41,6 +41,12 @@ class StreamController extends Controller
                     return redirect($player->code);
                     break;
                 case '2':
+                    if(strtolower($player->server->title) ==  "gamma")
+                        {
+                            $idVoe = explode("/",$player->code);
+                            $idVoe = $idVoe[4];
+                            $player->code = $player->server->embed."e/".$idVoe;
+                        }
                     return redirect($player->code);
                     break;
                 default:
@@ -54,7 +60,7 @@ class StreamController extends Controller
 		
 	}
 	
-	
+
 	public function degooStream(Request $request){
 		$parse_url = parse_url($request->get('url'));
         $id = str_replace(array('/share/','/files/'),'',$parse_url['path']);;

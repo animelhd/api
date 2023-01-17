@@ -278,7 +278,9 @@ class ApiController extends Controller
 	{
 	    try{
 	    	$animedi = $this->anime->getAnimeId($request);
-			//DB::unprepared('update animes set views = '.$animedi->totalviews.' where id = '.$animedi->id.'');
+			//DB::unprepared('update animes set views = '.$animedi->totalviews.' where id = '.$request->id.'');
+			//DB::unprepared('update episodes set views_app = views where id = '.$request->episode_id.'');
+			DB::unprepared('update episodes set views_app = views_app+1 where id = '.$request->episode_id.'');
 			return array(
 				'status' => true,
 			);
@@ -491,6 +493,16 @@ class ApiController extends Controller
 
 	//EndPoints App
 	//Lista de Animes EndPoint App Nueva
+	public function getAnimesRecentList()
+	{
+		try {
+			return $this->anime->getAnimesRecentList();
+		} catch (Exception $e) {
+			return array(
+	            'msg' => $e->getMessage()
+	        );
+		}
+	}
 	public function getAnimesList(Request $request)
 	{
 		try {
@@ -502,6 +514,16 @@ class ApiController extends Controller
 		}
 	}
 	//Lista de Episodes EndPoint App Nueva
+	public function getEpisodesRecentList()
+	{
+		try {
+			return $this->episode->getEpisodesRecentList();
+		} catch (Exception $e) {
+			return array(
+	            'msg' => $e->getMessage()
+	        );
+		}
+	}
 	public function getEpisodesList(Request $request)
 	{
 		try {
@@ -523,11 +545,31 @@ class ApiController extends Controller
 	        );
 	    }
 	}
-	//Lista de Players EndPoint App Nueva	
+	//Lista de Players EndPoint App Nueva
+	public function getPlayersRecentList()
+	{
+	    try{
+ 	        return $this->player->getPlayersRecentList();
+	    }catch(Exception $e){
+	        return array(
+	            'msg' => $e->getMessage()
+	        );
+	    }
+	}
 	public function getPlayersList(Request $request)
 	{
 	    try{
  	        return $this->player->getPlayersList($request);
+	    }catch(Exception $e){
+	        return array(
+	            'msg' => $e->getMessage()
+	        );
+	    }
+	}
+	public function getLastPlayer()
+	{
+	    try{
+ 	        return $this->player->getLastPlayer();
 	    }catch(Exception $e){
 	        return array(
 	            'msg' => $e->getMessage()
@@ -547,7 +589,11 @@ class ApiController extends Controller
 
 	public function config(Request $request)
 	{
-		if($request->get('v') == '3.2.2'){
+		if($request->get('v') == '3.2.3'){
+			return array(
+				'status' => true,
+			);
+		}else if($request->get('v') == '3.2.2'){
 			return array(
 				'status' => true,
 			);

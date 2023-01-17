@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ApiController;
+use App\Http\Controllers\Api\AppController;
 use App\Http\Controllers\Stream\StreamController;
 use App\Http\Controllers\Import\Tio;
 use App\Http\Controllers\Import\Jk;
@@ -28,24 +29,22 @@ Route::get('/sitemap', [ApiController::class, 'sitemap'])->name('sitemap');
 
 Route::prefix('app')->name('app.')->group(function () {
 	Route::get('home', [ApiController::class, 'getDataHome']);
-    Route::get('anime/{anime_slug}', [ApiController::class, 'getDataAnime']);
-	Route::prefix('animes')->name('animes.')->group(function () {	
-		Route::get('list3', [ApiController::class, 'getAnimesList'])->middleware(['throttle:animes']);
+	Route::prefix('anime')->name('animes.')->group(function () {	
+		Route::get('recentslist', [ApiController::class, 'getAnimesRecentList']);
 		//Route::get('list2', [ApiController::class, 'getAnimesList'])->middleware(['throttle:animes']);
 	});
-	Route::prefix('episodes')->name('episodes.')->group(function () {
-		Route::get('list3', [ApiController::class, 'getEpisodesList'])->middleware(['throttle:episodes']);
+	Route::get('anime/{anime_slug}', [ApiController::class, 'getDataAnime']);
+	Route::prefix('episode')->name('episodes.')->group(function () {
+		Route::get('recentslist', [ApiController::class, 'getEpisodesRecentList']);
 		//Route::get('list2', [ApiController::class, 'getEpisodesList'])->middleware(['throttle:episodes']);
 	});
-	Route::prefix('servers')->name('servers.')->group(function () {
-		Route::get('list3', [ApiController::class, 'getServersList'])->middleware(['throttle:servers']);
-		//Route::get('list2', [ApiController::class, 'getServersList'])->middleware(['throttle:servers']);
-	});	
-	Route::prefix('players')->name('players.')->group(function () {	
-		Route::get('list3', [ApiController::class, 'getPlayersList'])->middleware(['throttle:players']);
+	Route::get('server/list2', [ApiController::class, 'getServersList']);
+	Route::prefix('player')->name('players.')->group(function () {
+		Route::get('recentslist', [ApiController::class, 'getPlayersRecentList']);
+		Route::get('lastplayer', [ApiController::class, 'getLastPlayer']);
 		//Route::get('list2', [ApiController::class, 'getPlayersList'])->middleware(['throttle:players']);
 	});
-	//Route::get('views-anime/{id}', [ApiController::class, 'setViewsAnime']);
+	Route::get('view-anime/{id}/{episode_id}', [ApiController::class, 'setViewsAnime']);
 });
 
 // Routes appWeb

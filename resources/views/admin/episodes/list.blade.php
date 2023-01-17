@@ -75,6 +75,7 @@
 								<th>{{ __('Title') }}</th>
                                 <th>{{ __('Created at') }}</th>
                                 <th>{{ __('Views') }}</th>
+								<th>{{ __('Views') }}</th>
                                 <th class="text-center">{{ __('Options') }}</th>
 							</tr>
 						</thead>
@@ -86,7 +87,8 @@
                                 	</td>
                                 	@php $date = new DateTime($episode->created_at) @endphp
                                     <td>{{ $date->format('d M Y') }}</td>
-                                    <td>{{ $episode->views }}</td>
+									<td>{{ $episode->views }}</td>
+                                    <td>{{ $episode->views_app }}</td>
                                     <td class="text-center">
 									<ul class="table-controls">
 										<li>
