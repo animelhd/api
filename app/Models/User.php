@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\Auth;
+
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -80,11 +82,28 @@ class User extends Authenticatable
                 'msg' => 'Usuario y/o contraseña incorrectos.'
             );
         } else {
-            return array(
-				'code' => 200,
-                'token' => $user->createToken($request->device_name)->plainTextToken,
-				'user' => $user
-            );
+            if($user->isPremium){
+                if ($user->tokens()->exists()) {
+                    $user->tokens()->delete();
+                    return array(
+                        'code' => 200,
+                        'token' => $user->createToken($request->device_name)->plainTextToken,
+                        'user' => $user
+                    );
+                }else{
+                    return array(
+                        'code' => 200,
+                        'token' => $user->createToken($request->device_name)->plainTextToken,
+                        'user' => $user
+                    );
+                }
+            }else{
+                return array(
+                    'code' => 200,
+                    'token' => $user->createToken($request->device_name)->plainTextToken,
+                    'user' => $user
+                );
+            }
 		}
     }
 

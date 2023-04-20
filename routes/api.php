@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ApiController;
+use App\Http\Controllers\Api\WebController;
 use App\Http\Controllers\Api\AppController;
 use App\Http\Controllers\Stream\StreamController;
 use App\Http\Controllers\Import\Tio;
@@ -28,23 +29,34 @@ Route::get('/debug', [Tio::class, 'EpisodesImport'])->name('index');
 Route::get('/sitemap', [ApiController::class, 'sitemap'])->name('sitemap');
 
 Route::prefix('app')->name('app.')->group(function () {
+	Route::get('recents', [ApiController::class, 'getRecents']);
 	Route::get('home', [ApiController::class, 'getDataHome']);
 	Route::prefix('anime')->name('animes.')->group(function () {	
-		Route::get('recentslist', [ApiController::class, 'getAnimesRecentList']);
-		//Route::get('list2', [ApiController::class, 'getAnimesList'])->middleware(['throttle:animes']);
+		//Route::get('recentslist', [ApiController::class, 'getAnimesRecentList']);
+		//Route::get('list4', [ApiController::class, 'getAnimesList']);
+		Route::get('list5', [ApiController::class, 'getAnimesList']);
 	});
 	Route::get('anime/{anime_slug}', [ApiController::class, 'getDataAnime']);
 	Route::prefix('episode')->name('episodes.')->group(function () {
-		Route::get('recentslist', [ApiController::class, 'getEpisodesRecentList']);
-		//Route::get('list2', [ApiController::class, 'getEpisodesList'])->middleware(['throttle:episodes']);
+		//Route::get('recentslist', [ApiController::class, 'getEpisodesRecentList']);
+		//Route::get('list4', [ApiController::class, 'getEpisodesList']);
+		Route::get('list5', [ApiController::class, 'getEpisodesList']);
 	});
-	Route::get('server/list2', [ApiController::class, 'getServersList']);
+	Route::prefix('server')->name('server.')->group(function () {
+		Route::get('{anime_id}/{episode_number}/{languaje}', [ApiController::class, 'getServerApp']);
+		Route::get('list2', [ApiController::class, 'getServersList']);
+	});
 	Route::prefix('player')->name('players.')->group(function () {
-		Route::get('recentslist', [ApiController::class, 'getPlayersRecentList']);
+		//Route::get('recentslist', [ApiController::class, 'getPlayersRecentList']);
 		Route::get('lastplayer', [ApiController::class, 'getLastPlayer']);
-		//Route::get('list2', [ApiController::class, 'getPlayersList'])->middleware(['throttle:players']);
+		//Route::get('list4', [ApiController::class, 'getPlayersList']);
+		Route::get('list5', [ApiController::class, 'getPlayersList']);
+		Route::get('{player_id}', [ApiController::class, 'getPlayerApp']);
 	});
 	Route::get('view-anime/{id}/{episode_id}', [ApiController::class, 'setViewsAnime']);
+
+	//Route::get('reports/add', [ApiController::class, 'addReportPlayer']);
+	//Route::get('reporte/add', [ApiController::class, 'addReportPlayer']);
 });
 
 // Routes appWeb
@@ -71,9 +83,40 @@ Route::prefix('players')->name('players.')->group(function () {
 Route::get('filterings', [ApiController::class, 'filterings']);
 // Route::fallback(function () {return redirect('404');});
 
+
+
+// Routes Web V1
+Route::prefix('web/v1')->group(function () {
+	Route::get('home', [WebController::class, 'home']);
+	Route::prefix('anime')->name('anime.')->group(function () {
+		Route::get('latino', [ApiController::class, 'latino']);
+		Route::get('latino2', [ApiController::class, 'latino2']);
+		Route::get('trending', [ApiController::class, 'trending']);
+		Route::get('more-view', [ApiController::class, 'moreView']);	
+		Route::get('search', [ApiController::class, 'search']);
+		Route::get('simulcast', [ApiController::class, 'simulcast']);
+		Route::get('list', [ApiController::class, 'listAnimes']);
+		Route::get('{anime_slug}', [ApiController::class, 'getAnime']);
+		Route::get('{anime_slug}/episodes', [ApiController::class, 'getAnimeEpisodes']);
+		Route::get('{anime_slug}/episodes/{episode_number}', [ApiController::class, 'getEpisodePlayers']);
+		Route::get('{anime_slug}/recommendations', [ApiController::class, 'getAnimeRecommendations']);
+	});
+	Route::prefix('episodes')->name('episodes.')->group(function () {
+		Route::get('{anime_slug}/{episode_number}', [ApiController::class, 'getEpisode']);
+	});
+	Route::prefix('players')->name('players.')->group(function () {
+		Route::get('{id}', [StreamController::class, 'getVideoMp4']);
+	});
+	Route::get('filterings', [ApiController::class, 'filterings']);
+	// Route::fallback(function () {return redirect('404');});
+});
+
+
+
 // Config
 
 Route::get('config', [ApiController::class, 'config']);
+Route::get('version', [ApiController::class, 'version']);
 
 // Authenticate User
 Route::prefix('auth')->name('auth.')->group(function () {

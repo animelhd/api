@@ -9,9 +9,13 @@ use Animelhd\AnimesFavorite\Traits\Favoriteable;
 use Animelhd\AnimesView\Traits\Vieweable;
 use Animelhd\AnimesWatching\Traits\Watchingable;
 
+use Rennokki\QueryCache\Traits\QueryCacheable;
+
 class Anime extends Model
 {
     use Sluggable;
+
+	use QueryCacheable;
 
 	use Favoriteable;
 	use Vieweable;
@@ -66,7 +70,8 @@ class Anime extends Model
 	
 	public function getBeingWatched()
     {
-        return $this->select([
+        return $this->cacheFor(now()->addHours(24))
+			->select([
 				\DB::raw("sum(episodes.views) as totalviews")
 			,'name','slug','poster','aired'])
 			->leftJoin('episodes','episodes.anime_id','=','animes.id')
@@ -77,7 +82,7 @@ class Anime extends Model
     }	
 	public function getPopularToday()
     {
-        return $this
+        return $this->cacheFor(now()->addHours(24))
 			->select('name','slug','poster','vote_average','aired')
             ->orderBy('vote_average','desc')			
 			->limit(28)
@@ -86,7 +91,8 @@ class Anime extends Model
 
 	public function getAnimesLatino()
     {
-        return $this->select('name', 'slug', 'poster', 'vote_average','status',
+        return $this
+			->select('name', 'slug', 'poster', 'vote_average','status',
 		     \DB::raw('MAX(number) as number'),\DB::raw('MAX(players.id) as idplayer'))
 			->LeftJoin('episodes', 'episodes.anime_id', '=', 'animes.id')
 			->LeftJoin('players','episode_id', '=', 'episodes.id')
@@ -121,7 +127,8 @@ class Anime extends Model
 	
 	public function getUpcomingEpisodes()
     {
-        return $this->where('status',1)
+        return $this->cacheFor(now()->addHours(24))
+			->where('status',1)
 			->select('name','slug','banner','broadcast',
 				\DB::raw('(select created_at from episodes where anime_id = animes.id order by number desc limit 1) as date'),
 				\DB::raw('(select HOUR(created_at) from episodes where anime_id = animes.id order by number desc limit 1) as hour'),
@@ -146,7 +153,8 @@ class Anime extends Model
 	
 	public function getAnimePage($request)
     {
-        return $this->select(['animes.*',
+        return $this->cacheFor(now()->addHours(24))
+			->select(['animes.*',
 				\DB::raw("IFNULL(sum(episodes.views),0) as totalviews")
 			])
 			->with(['episodes' => function ($q) {
@@ -171,7 +179,8 @@ class Anime extends Model
 
 	public function getAnimeEpisodePage($request)
     {
-        return $this->select('id','name','slug','banner','poster')
+        return $this->cacheFor(now()->addHours(24))
+			->select('id','name','slug','banner','poster')
 			->where('slug',$request->anime_slug)			
 			->first();
     }
@@ -238,18 +247,20 @@ class Anime extends Model
 	//EndPoints App
 	public function getAnimesRecentList()
     {
-        return $this->select('id', 'name', 'name_alternative as nameAlternative', 'slug', 'banner as imagenCapitulo', 'poster as imagen', 'overview', \DB::raw("Date(aired) as aired"), 'type', 'status', 'genres', 'rating', 'trailer', 'vote_average as voteAverage', 'views as visitas', 'isTopic')
-			->where('id', '>=', 903)
-			->where('id', '<=', 957)	
+        return $this->cacheFor(now()->addHours(24))
+			->select('id', 'name', 'name_alternative as nameAlternative', 'slug', 'banner as imagenCapitulo', 'poster as imagen', 'overview', \DB::raw("Date(aired) as aired"), 'type', 'status', 'genres', 'rating', 'trailer', 'vote_average as voteAverage', 'views as visitas', 'isTopic')
+			->where('id', '>=', 974)
+			->where('id', '<=', 1014)
 			->orderBy('aired','desc')
 			->get();
 	}
 
 	public function getAnimesList($request)
     {
-		return $this->select('id', 'name', 'name_alternative as nameAlternative', 'slug', 'banner as imagenCapitulo', 'poster as imagen', 'overview', \DB::raw("Date(aired) as aired"), 'type', 'status', 'genres', 'rating', 'trailer', 'vote_average as voteAverage', 'views as visitas', 'isTopic')	
-			->where('updated_at', '>=', '2023-01-05 13:48:29')
-			->where('id', '<=', 945)
+		return $this->cacheFor(now()->addHours(24))
+			->select('id', 'name', 'name_alternative as nameAlternative', 'slug', 'banner as imagenCapitulo', 'poster as imagen', 'overview', \DB::raw("Date(aired) as aired"), 'type', 'status', 'genres', 'rating', 'trailer', 'vote_average as voteAverage', 'views as visitas', 'isTopic')	
+			->where('updated_at', '>=', '2023-04-01 16:59:05')
+			->where('id', '<=', 1014)
 			->orderBy('aired','desc')
 			->get();
 	}

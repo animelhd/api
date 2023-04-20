@@ -16,7 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 
-class ApiController extends Controller
+class WebController extends Controller
 {
     /**
      * model instances.
@@ -82,7 +82,7 @@ class ApiController extends Controller
 		}
 	}
 
-	public function releases(Request $request)
+	public function home(Request $request)
 	{
 		try {
 			return $this->episode->getReleases();

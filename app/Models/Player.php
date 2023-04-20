@@ -4,8 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+use Rennokki\QueryCache\Traits\QueryCacheable;
+
 class Player extends Model
 {
+
+	use QueryCacheable;
+
     /**
      * The attributes that aren't mass assignable.
      *
@@ -39,7 +44,8 @@ class Player extends Model
 	
 	public function getPlayersEpisode($request, $episode)
     {
-        return $this->select('players.id','code','languaje','server_id')
+        return $this
+			->select('players.id','code','languaje','server_id')
 			->leftJoin('servers','servers.id','=','players.server_id')
 			->where('episode_id',$episode->id)
 			->where(function ($query) {
@@ -53,7 +59,8 @@ class Player extends Model
 
     public function getPlayersEpisodeNew($request, $episode)
     {
-        return $this->select('players.id','languaje','server_id')
+        return $this
+			->select('players.id','languaje','server_id')
 			->leftJoin('servers','servers.id','=','players.server_id')
 			->where('episode_id',$episode->id)
 			->where(function ($query) {
@@ -66,18 +73,13 @@ class Player extends Model
     }
     
     //Endpoint App
-	public function getPlayersRecentList()
+	public function getPlayersRecents()
     {
-        return $this->select('players.id', 'code as link', 'languaje', 'embed', 'server_id as serverId', 'episode_id as episodeId')
+        return $this->cacheFor(now()->addHours(24))
+			->select('players.id', 'code as link', 'languaje', 'embed', 'server_id as serverId', 'episode_id as episodeId')
 			->leftJoin('servers','servers.id','=','players.server_id')
-            ->where('episode_id', '>=', 18331)
-			->where('episode_id', '<=', 18820)	
-			->where(function ($query) {
-				$query->where('status', 1)
-					  ->orWhere('status', 3);
-			})
-			->orwhere('episode_id', '>=', 13309)
-			->where('episode_id', '<=', 13369)	
+            ->where('updated_at', '>=', '2023-04-01 23:59:13')
+			->where('episode_id', '<=', 19651)	
 			->where(function ($query) {
 				$query->where('status', 1)
 					  ->orWhere('status', 3);
@@ -89,29 +91,41 @@ class Player extends Model
 
 	public function getPlayersList($request)
     {
-        return $this->select('players.id', 'code as link', 'languaje', 'embed', 'server_id as serverId', 'episode_id as episodeId')
+        return $this->cacheFor(now()->addHours(24))
+			->select('players.id', 'code as link', 'languaje', 'embed', 'server_id as serverId', 'episode_id as episodeId')
 			->leftJoin('servers','servers.id','=','players.server_id')
-			->where('updated_at', '>=', '2023-01-05 13:53:04')
-			->where('episode_id', '<=', 18750)
+            ->where('updated_at', '>=', '2023-04-01 23:59:13')
+			->where('episode_id', '<=', 19651)	
 			->where(function ($query) {
 				$query->where('status', 1)
 					  ->orWhere('status', 3);
 			})
 			->orderby('episode_id','desc')
 			->orderby('players.id','desc')
-			->paginate(1000);
+			->get();
     }
 
 	public function getLastPlayer()
 	{
-        return $this->select('players.id')
+        return $this->cacheFor(now()->addHours(1))
+			->select('players.id')
 			->leftJoin('servers','servers.id','=','players.server_id')
+			->where('episode_id', '<=', 19651)
 			->where(function ($query) {
 				$query->where('status', 1)
 					  ->orWhere('status', 3);
 			})
 			->orderby('players.id','desc')
 			->limit(1)
+			->first();
+    }
+	//App Nueva
+	public function getPlayerApp($request)
+	{
+        return $this->select('players.id', 'title as name', 'code as link', 'embed', 'episode_id', 'number', 'anime_id as animeId')
+			->leftJoin('servers','servers.id','=','players.server_id')
+			->leftJoin('episodes', 'episodes.id', '=', 'players.episode_id')
+			->where('players.id', $request->player_id)
 			->first();
     }
 
