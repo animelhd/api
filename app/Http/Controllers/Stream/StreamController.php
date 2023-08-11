@@ -22,10 +22,10 @@ class StreamController extends Controller
 	{
         try {
 
-            // $referer = $_SERVER['HTTP_REFERER'] ?? null;
-            // $parse = parse_url($referer);
-            // if($parse['host'] != 'www.animelatinohd.com')
-            //     throw new Exception('Sin Acceso');
+            $referer = $_SERVER['HTTP_REFERER'] ?? null;
+            $parse = parse_url($referer);
+            if($parse['host'] != 'www.animelatinohd.com')
+                throw new Exception('Sin Acceso');
 
             $player = Player::where('id',$request->id)->with('server')->first();
 
@@ -58,6 +58,54 @@ class StreamController extends Controller
             abort(403);
         }
 		
+	}
+
+    public function getStream2(Request $request)
+	{
+        try {
+
+            // // $referer = $_SERVER['HTTP_REFERER'] ?? null;
+            // // $parse = parse_url($referer);
+            // // if($parse['host'] != 'www.animelatinohd.com')
+            // //     throw new Exception('Sin Acceso');
+
+            // $player = Player::where('id',$request->id)->with('server')->first();
+
+            // if(!$player)
+            //     throw new Exception('No encontrado');
+
+            // switch ($player->server->type) {
+            //     case '0':
+            //         $data = ['player' => $player];
+            //         return view('stream.video')->with($data);
+            //         break;
+            //     case '1':
+            //         return redirect($player->code);
+            //         break;
+            //     case '2':
+            //         if(strtolower($player->server->title) ==  "gamma")
+            //             {
+            //                 $idVoe = explode("/",$player->code);
+            //                 $idVoe = $idVoe[4];
+            //                 $player->code = $player->server->embed."e/".$idVoe;
+            //             }
+            //         return redirect($player->code);
+            //         break;
+            //     default:
+            //         return redirect($player->code);
+            //         break;
+            // }
+
+            $data = [
+                'url' => 'animes'
+            ];
+
+            return view('stream.iframe')->with($data);
+            
+        } catch (\Exception $e) {
+            abort(403);
+        }
+
 	}
 	
 

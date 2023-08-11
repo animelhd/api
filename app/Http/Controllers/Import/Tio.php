@@ -146,16 +146,16 @@ class Tio extends Controller
     public function getServerName($name){
         switch(strtolower($name)){
             case 'fembed':
-                return 'AlphaM';
+                return 'none';
             case 'umi':
             case 'streamium':
                 return 'none';				
             case 'mega':
                 return 'none';
             case 'okru':
-                return 'Zeta';
+                return 'none';
             default :
-                return $name;
+                return 'none';
         }
     }
     
@@ -304,6 +304,66 @@ class Tio extends Controller
             $new_array[] = (object)$to_obj;
         }
         return $new_array;
+    }
+
+    function getLinksByServer($server, $anime, $inicio, $fin) {
+        try {
+            // Convertir los valores de inicio y fin a enteros
+            $start = intval($inicio);
+            $end = intval($fin);
+    
+            // Validar que los valores de inicio y fin sean números válidos
+            if (!is_numeric($start) || !is_numeric($end) || $start > $end) {
+                return response()->json(['error' => 'Invalid start and end values'], 400);
+            }
+    
+            $links = $this->getLinksInRange($server, $anime, $start, $end);
+            return response()->json($links);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Internal Server Error'], 500);
+        }
+    }
+
+    // Función para obtener los enlaces del servidor voe.sx en un rango específico
+    function getLinksInRange($server, $anime, $start, $end) {
+        $links_all = [];
+        $client = new Client();
+        for ($i = $start; $i <= $end; $i++) {
+            $url = "https://tioanime.com/ver/$anime-$i";
+            $links = $this->getLinksFromURL($server, $client, $url);
+            if ($links && isset($links[0])) {
+                if (strtolower($server) === "voe") {
+                    $links[0] = $links[0] . "/$anime-$i.mp4";
+                }
+            } else {
+                throw new Exception("No se ha encontrado links para el servidor", 2);
+            }
+            $links_all = array_merge($links_all, $links);
+        }
+        return $links_all;
+    }
+
+    // Función para obtener los enlaces del servidor voe.sx desde una URL
+    function getLinksFromURL($server, $client, $url) {
+        try {
+            $response = $client->get($url);
+            $body = (string) $response->getBody();
+            $start = strpos($body, 'var videos = [[');
+            $end = strpos($body, ']];');
+            if ($start === false || $end === false) {
+                return [];
+            }
+            $linksString = substr($body, $start, $end - $start + 2);
+            $linksArrayString = str_replace('var videos = ', '', $linksString);
+            $linksArray = json_decode($linksArrayString, true);
+            $links = array_filter($linksArray, function ($link) use ($server) {
+                return strtolower($link[0]) == $server;
+            });
+            return array_column($links, 1);
+        } catch (Exception $e) {
+            return "The server link was not found in this episode.";
+        }
+    
     }
 
 }

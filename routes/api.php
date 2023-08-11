@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Api\WebController;
 use App\Http\Controllers\Api\AppController;
@@ -25,38 +26,33 @@ Route::prefix('import')->name('import.')->group(function () {
 
 Route::get('/import/monos', [Monos::class, 'EpisodesImport']);
 
+Route::get('/tio/{server}/{anime}/{inicio}/{fin}', [Tio::class, 'getLinksByServer']);
+
 Route::get('/debug', [Tio::class, 'EpisodesImport'])->name('index');
 Route::get('/sitemap', [ApiController::class, 'sitemap'])->name('sitemap');
 
 Route::prefix('app')->name('app.')->group(function () {
-	Route::get('recents', [ApiController::class, 'getRecents']);
+	Route::get('recents', [ApiController::class, 'getRecentApp']);
+	Route::get('newApp', [ApiController::class, 'getNewApp']);
+	Route::get('listApp', [ApiController::class, 'getListApp']);
 	Route::get('home', [ApiController::class, 'getDataHome']);
-	Route::prefix('anime')->name('animes.')->group(function () {	
-		//Route::get('recentslist', [ApiController::class, 'getAnimesRecentList']);
-		//Route::get('list4', [ApiController::class, 'getAnimesList']);
-		Route::get('list5', [ApiController::class, 'getAnimesList']);
+	Route::middleware(['throttle:app'])->group(function () {
+		//Route::get('anime/list5', [ApiController::class, 'getAnimeList']);
+		//Route::get('episode/list5', [ApiController::class, 'getEpisodeList']);
+		//Route::get('server/list2', [ApiController::class, 'getServersList']);
+		//Route::get('player/list5', [ApiController::class, 'getPlayerList']);
 	});
 	Route::get('anime/{anime_slug}', [ApiController::class, 'getDataAnime']);
-	Route::prefix('episode')->name('episodes.')->group(function () {
-		//Route::get('recentslist', [ApiController::class, 'getEpisodesRecentList']);
-		//Route::get('list4', [ApiController::class, 'getEpisodesList']);
-		Route::get('list5', [ApiController::class, 'getEpisodesList']);
-	});
 	Route::prefix('server')->name('server.')->group(function () {
-		Route::get('{anime_id}/{episode_number}/{languaje}', [ApiController::class, 'getServerApp']);
-		Route::get('list2', [ApiController::class, 'getServersList']);
+		//Route::get('{anime_id}/{episode_number}/{languaje}', [ApiController::class, 'getServerApp']);
 	});
 	Route::prefix('player')->name('players.')->group(function () {
-		//Route::get('recentslist', [ApiController::class, 'getPlayersRecentList']);
 		Route::get('lastplayer', [ApiController::class, 'getLastPlayer']);
-		//Route::get('list4', [ApiController::class, 'getPlayersList']);
-		Route::get('list5', [ApiController::class, 'getPlayersList']);
 		Route::get('{player_id}', [ApiController::class, 'getPlayerApp']);
 	});
 	Route::get('view-anime/{id}/{episode_id}', [ApiController::class, 'setViewsAnime']);
+	Route::get('view-animes/{id}', [ApiController::class, 'setViewsAnimes']);
 
-	//Route::get('reports/add', [ApiController::class, 'addReportPlayer']);
-	//Route::get('reporte/add', [ApiController::class, 'addReportPlayer']);
 });
 
 // Routes appWeb
@@ -125,6 +121,7 @@ Route::prefix('auth')->name('auth.')->group(function () {
     Route::post('register', [RegisteredUserController::class, 'store']);
 	Route::post('registerApp', [ApiController::class, 'getRegister']);
 	Route::middleware('auth:sanctum')->group(function () {
+		Route::post('update', [UserController::class, 'updateProfile']);
 		Route::get('user', [ApiController::class, 'loginUser']);
 		Route::get('logout', [ApiController::class, 'logoutUser']);
 		Route::prefix('favorite')->group(function () {

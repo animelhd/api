@@ -37,6 +37,9 @@
                             <li class="{{ ($page_name === 'list') ? 'active' : '' }}">
                                 <a href="{{ route('admin.animes.index') }}">{{ __('List') }}</a>
                             </li>
+                            <li class="{{ ($page_name === 'listLatino') ? 'active' : '' }}">
+                                <a href="{{ route('admin.animes.indexLatino') }}">{{ __('Latino') }}</a>
+                            </li>
                             <li class="{{ ($page_name === 'create') ? 'active' : '' }}">
                                 <a href="{{ route('admin.animes.create') }}">{{ __('Añadir') }}</a>
                             </li>

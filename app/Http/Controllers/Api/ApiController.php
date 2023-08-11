@@ -185,12 +185,6 @@ class ApiController extends Controller
 	       	if(!$data){
 				return redirect('404');
 	        }
-			if($request->header('Authorization') && $request->user_id){
-				$user = $this->user::find($request->user_id);
-				$data = $user->attachFavoriteStatus($data);
-				$data = $user->attachSubscriptionStatus($data);
-				unset($data->episodes);
-			}
 			return $data;
 		} catch (Exception $e) {
 			return array(
@@ -206,12 +200,6 @@ class ApiController extends Controller
 	       	if(!$data){
 				return redirect('404');
 	        }
-			if($request->header('Authorization') && $request->user_id){
-				$user = $this->user::find($request->user_id);
-				foreach($data->episodes as $episode){
-					$episode->viewed = $user->hasLiked($episode);
-				}
-			}
 			return $data;
 		} catch (Exception $e) {
 			return array(
@@ -281,6 +269,22 @@ class ApiController extends Controller
 			//DB::unprepared('update animes set views = '.$animedi->totalviews.' where id = '.$request->id.'');
 			//DB::unprepared('update episodes set views_app = views where id = '.$request->episode_id.'');
 			DB::unprepared('update episodes set views_app = views_app+1 where id = '.$request->episode_id.'');
+			return array(
+				'status' => true,
+			);
+	    }catch(Exception $e){
+	        return array(
+	            'msg' => $e->getMessage()
+	        );
+	    }
+	}
+
+	public function setViewsAnimes(Request $request)
+	{
+	    try{
+	    	$animedi = $this->anime->getAnimeId($request);
+			DB::unprepared('update animes set views_app = '.$animedi->totalviews.' where id = '.$request->id.'');
+			//DB::unprepared('update episodes set views_app = views where id = '.$request->episode_id.'');
 			return array(
 				'status' => true,
 			);
@@ -395,7 +399,7 @@ class ApiController extends Controller
 	public function listFavoriteAnime(Request $request){
 		try {
 			$user = $this->user::find($request->user_id);
-			$data = $user->getFavoriteItems(Anime::class)->select('id','name','slug','poster', 'isTopic')->orderBy('name','asc')->get();
+			$data = $user->getFavoriteItems(Anime::class)->cacheFor(now()->addHours(1))->select('id','name','slug','poster', 'isTopic')->orderBy('name','asc')->get();
 			return $data;
 		} catch (Exception $e) {
 			return array(
@@ -493,14 +497,44 @@ class ApiController extends Controller
 	}
 
 	//EndPoints App
-	public function getRecents()
+	public function getRecentApp()
 	{
 		try {
 			return array(
-			    'animes' => $this->anime->getAnimesRecentList(),
-			    'episodes' => $this->episode->getEpisodesRecents(),
+			    'animes' => $this->anime->getAnimesRecent(),
+			    'episodes' => $this->episode->getEpisodesRecent(),
 			    'servers' => $this->server->getServersList(),
-			    'players' => $this->player->getPlayersRecents()
+			    'players' => $this->player->getPlayersRecent()
+			);
+		} catch (Exception $e) {
+			return array(
+	            'msg' => $e->getMessage()
+	        );
+		}
+	}
+	public function getNewApp()
+	{
+		try {
+			return array(
+			    'animes' => $this->anime->getAnimesNew(),
+			    'episodes' => $this->episode->getEpisodesNew(),
+			    'servers' => $this->server->getServersList(),
+			    'players' => $this->player->getPlayersNew()
+			);
+		} catch (Exception $e) {
+			return array(
+	            'msg' => $e->getMessage()
+	        );
+		}
+	}
+	public function getListApp()
+	{
+		try {
+			return array(
+			    'animes' => $this->anime->getAnimesList(),
+			    'episodes' => $this->episode->getEpisodesList(),
+			    'servers' => $this->server->getServersList(),
+			    'players' => $this->player->getPlayersList()
 			);
 		} catch (Exception $e) {
 			return array(
@@ -531,20 +565,10 @@ class ApiController extends Controller
 	}	
 	//Fin App Nueva	
 	//Lista de Animes EndPoint App Nueva
-	public function getAnimesRecentList()
+	public function getAnimeList()
 	{
 		try {
-			return $this->anime->getAnimesRecentList();
-		} catch (Exception $e) {
-			return array(
-	            'msg' => $e->getMessage()
-	        );
-		}
-	}
-	public function getAnimesList(Request $request)
-	{
-		try {
-			return $this->anime->getAnimesList($request);
+			return $this->anime->getAnimeList();
 		} catch (Exception $e) {
 			return array(
 	            'msg' => $e->getMessage()
@@ -552,20 +576,10 @@ class ApiController extends Controller
 		}
 	}
 	//Lista de Episodes EndPoint App Nueva
-	public function getEpisodesRecentList()
+	public function getEpisodeList()
 	{
 		try {
-			return $this->episode->getEpisodesRecentList();
-		} catch (Exception $e) {
-			return array(
-	            'msg' => $e->getMessage()
-	        );
-		}
-	}
-	public function getEpisodesList(Request $request)
-	{
-		try {
-			return $this->episode->getEpisodesList($request);
+			return $this->episode->getEpisodeList();
 		} catch (Exception $e) {
 			return array(
 	            'msg' => $e->getMessage()
@@ -584,20 +598,10 @@ class ApiController extends Controller
 	    }
 	}
 	//Lista de Players EndPoint App Nueva
-	public function getPlayersRecentList()
+	public function getPlayerList()
 	{
 	    try{
- 	        return $this->player->getPlayersRecentList();
-	    }catch(Exception $e){
-	        return array(
-	            'msg' => $e->getMessage()
-	        );
-	    }
-	}
-	public function getPlayersList(Request $request)
-	{
-	    try{
- 	        return $this->player->getPlayersList($request);
+ 	        return $this->player->getPlayerList();
 	    }catch(Exception $e){
 	        return array(
 	            'msg' => $e->getMessage()
@@ -634,7 +638,7 @@ class ApiController extends Controller
 				->join('servers','servers.id','players.server_id')
 				->first();
 			$server = strtolower($data->server);
-			if($server != "alpham"){
+			if($server != "dseta"){
 				if(!DB::table('reportes')->where('player_id', $request->player_id)->exists()){
 					DB::table('reportes')->insert($data->toArray());
 				}
@@ -726,7 +730,11 @@ class ApiController extends Controller
 
 	public function version(Request $request)
 	{
-		if($request->get('v') == '1.0.1'){
+		if($request->get('v') == '1.0.2'){
+			return array(
+				'status' => true,
+			);
+		}else if($request->get('v') == '1.0.1'){
 			return array(
 				'status' => true,
 			);

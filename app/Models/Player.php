@@ -73,13 +73,20 @@ class Player extends Model
     }
     
     //Endpoint App
-	public function getPlayersRecents()
+	public function getPlayersRecent()
     {
         return $this->cacheFor(now()->addHours(24))
-			->select('players.id', 'code as link', 'languaje', 'embed', 'server_id as serverId', 'episode_id as episodeId')
+			->select('players.id', 'code as link', 'languaje', 'server_id as serverId', 'episode_id as episodeId')
 			->leftJoin('servers','servers.id','=','players.server_id')
-            ->where('updated_at', '>=', '2023-04-01 23:59:13')
-			->where('episode_id', '<=', 19651)	
+			->where('episode_id', '>=', 19529)
+			->where('episode_id', '<=', 20656)	
+			->where(function ($query) {
+				$query->where('status', 1)
+					  ->orWhere('status', 3);
+			})
+            ->orwhere('updated_at', '>=', '2023-04-02 00:00:04')
+			->where('episode_id', '<=', 20656)
+			->where('languaje', '=', 1)
 			->where(function ($query) {
 				$query->where('status', 1)
 					  ->orWhere('status', 3);
@@ -89,16 +96,39 @@ class Player extends Model
 			->get();
     }
 
-	public function getPlayersList($request)
+	public function getPlayersNew()
     {
         return $this->cacheFor(now()->addHours(24))
-			->select('players.id', 'code as link', 'languaje', 'embed', 'server_id as serverId', 'episode_id as episodeId')
+			->select('players.id', 'code as link', 'languaje', 'server_id as serverId', 'episode_id as episodeId')
 			->leftJoin('servers','servers.id','=','players.server_id')
-            ->where('updated_at', '>=', '2023-04-01 23:59:13')
-			->where('episode_id', '<=', 19651)	
+			->where('episode_id', '>=', 20231)
+			->where('episode_id', '<=', 20656)	
 			->where(function ($query) {
-				$query->where('status', 1)
-					  ->orWhere('status', 3);
+				$query->where('server_id', 1)
+					  ->orWhere('server_id', 5);
+			})
+			->orwhere('updated_at', '>=', '2023-07-05 00:00:05')
+			->where('episode_id', '<=', 20656)
+			->where('languaje', '=', 1)
+			->where(function ($query) {
+				$query->where('server_id', 1)
+					  ->orWhere('server_id', 5);
+			})
+			->orderby('episode_id','desc')
+			->orderby('players.id','desc')
+			->get();
+    }
+
+	public function getPlayersList()
+    {
+        return $this->cacheFor(now()->addHours(24))
+			->select('players.id', 'code as link', 'languaje', 'server_id as serverId', 'episode_id as episodeId')
+			->leftJoin('servers','servers.id','=','players.server_id')
+			->where('updated_at', '>=', '2023-07-05 00:00:07')
+			->where('episode_id', '<=', 20231)	
+			->where(function ($query) {
+				$query->where('server_id', 1)
+					  ->orWhere('server_id', 5);
 			})
 			->orderby('episode_id','desc')
 			->orderby('players.id','desc')
@@ -110,7 +140,7 @@ class Player extends Model
         return $this->cacheFor(now()->addHours(1))
 			->select('players.id')
 			->leftJoin('servers','servers.id','=','players.server_id')
-			->where('episode_id', '<=', 19651)
+			->where('episode_id', '<=', 20656)
 			->where(function ($query) {
 				$query->where('status', 1)
 					  ->orWhere('status', 3);
@@ -118,6 +148,29 @@ class Player extends Model
 			->orderby('players.id','desc')
 			->limit(1)
 			->first();
+    }
+
+	public function getPlayerList()
+    {
+        return $this->cacheFor(now()->addHours(24))
+			->select('players.id', 'code as link', 'languaje', 'server_id as serverId', 'episode_id as episodeId')
+			->leftJoin('servers','servers.id','=','players.server_id')
+			->where('episode_id', '>=', 19529)
+			->where('episode_id', '<=', 20650)	
+			->where(function ($query) {
+				$query->where('status', 1)
+					  ->orWhere('status', 3);
+			})
+            ->orwhere('updated_at', '>=', '2023-04-02 00:00:04')
+			->where('episode_id', '<=', 20650)
+			->where('languaje', '=', 1)
+			->where(function ($query) {
+				$query->where('status', 1)
+					  ->orWhere('status', 3);
+			})
+			->orderby('episode_id','desc')
+			->orderby('players.id','desc')
+			->get();
     }
 	//App Nueva
 	public function getPlayerApp($request)

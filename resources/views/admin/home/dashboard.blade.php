@@ -37,7 +37,7 @@
                                     <tr>
                                         <td><div class="td-content">{{ $episode->anime->name.' '.$episode->number }}</div></td>
                                         <td><div class="td-content">{{ date('d-M-Y', strtotime($episode->created_at)) }}</div></td>
-                                        <td><div class="td-content">{{ $episode->views.' '.__('Views') }}</div></td>
+                                        <td><div class="td-content">{{ $episode->views_app.' '.__('Views') }}</div></td>
                                     </tr>
                                 @empty
                                 @endforelse

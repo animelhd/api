@@ -93,6 +93,8 @@ Route::get('degoo', [StreamController::class, 'degooStream']);
 Route::get('stream/{id}', [StreamController::class, 'getStream'])->name('stream');
 Route::get('generateVideo/{s}/{code}', [StreamController::class, 'generateVideo'])->name('generateVideo');
 
+Route::get('stream2/{id}', [StreamController::class, 'getStream2'])->name('stream2');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -107,11 +109,13 @@ Route::post('/admin/logout', [AdminAuthenticateController::class, 'destroy'])->m
 Route::middleware('authadmin')->prefix('admin')->name('admin.')->group(function (){
     Route::get('/', [DashboardController::class, 'index'])->name('index');
     Route::resource('animes', AnimeController::class);
+    Route::get('animesLatino', [AnimeController::class, 'indexLatino'])->name('animes.indexLatino');
     Route::resource('genres', GenreController::class);
     Route::resource('servers', ServerController::class);
     Route::get('animes-generate', [AnimeController::class, 'generate'])->name('animes.generate');
     Route::name('animes.')->prefix('animes')->group(function () {
         Route::resource('{anime_id}/episodes', EpisodeController::class);
+        Route::get('{anime_id}/episodesLatino', [EpisodeController::class, 'indexLatino'])->name('episodes.indexLatino');
         Route::get('{anime_id}/episodes-generate', [EpisodeController::class, 'generate'])->name('episodes.generate');
         Route::get('{anime_id}/players-generate', [EpisodeController::class, 'generatePlayers'])->name('episodes.generatePlayers');
         Route::post('{anime_id}/episodes-alldelete', [EpisodeController::class, 'allDelete'])->name('episodes.allDelete');

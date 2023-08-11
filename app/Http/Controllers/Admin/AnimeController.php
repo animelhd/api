@@ -28,6 +28,24 @@ class AnimeController extends Controller
         return view('admin.animes.list')->with($data);
     }
 
+    public function indexLatino()
+    {
+        $animes = Anime::select('animes.*')
+            ->leftjoin('episodes','episodes.anime_id','animes.id')
+            ->leftjoin('players','players.episode_id','episodes.id')
+            ->groupby('name')
+            ->where('languaje',1)
+            ->distinct()
+            ->orderby('animes.id','desc')
+            ->get();
+        $data = [
+            'category_name' => 'animes',
+            'page_name' => 'listLatino',
+            'animes' => $animes
+        ];
+        return view('admin.animes.listLatino')->with($data);
+    }
+
     /**
      * Show the form for creating a new resource.
      *

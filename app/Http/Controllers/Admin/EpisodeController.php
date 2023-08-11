@@ -32,6 +32,28 @@ class EpisodeController extends Controller
         return view('admin.episodes.list')->with($data);
     }
 
+    public function indexLatino(Request $request)
+    {
+        $anime = Anime::where('id',$request->anime_id)->first();
+        if(!$anime){
+            abort(404,'Not found Anime');
+        }
+        $episodes = Episode::select('episodes.*')
+            ->orderby('number','desc')
+            ->leftjoin('players','players.episode_id','episodes.id')
+            ->groupby('number')
+            ->where('languaje',1)
+            ->where('anime_id',$anime->id)
+            ->get();
+        $data = [
+            'category_name' => $anime->title,
+            'page_name' => 'list',
+            'anime' => $anime,
+            'episodes' => $episodes
+        ];
+        return view('admin.episodes.listLatino')->with($data);
+    }
+
     /**
      * Show the form for creating a new resource.
      *

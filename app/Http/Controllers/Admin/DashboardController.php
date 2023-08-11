@@ -16,7 +16,7 @@ class DashboardController extends Controller
     {
         $users = User::orderby('id','desc')->limit(10)->get();
         $animes = Anime::orderby('id','desc')->limit(10)->get();
-        $episodes = Episode::orderby('views','desc')->limit(10)->get();
+        $episodes = Episode::orderby('views_app','desc')->limit(10)->get();
         $data = [
             'category_name' => 'dashboard',
             'page_name' => 'analytics',
