@@ -542,6 +542,21 @@ class ApiController extends Controller
 	        );
 		}
 	}
+	public function getListApp2()
+	{
+		try {
+			return array(
+			    'animes' => $this->anime->getAnimesList2(),
+			    'episodes' => $this->episode->getEpisodesList2(),
+				'servers' => $this->server->getServersList2(),
+			    'players' => $this->player->getPlayersList2()
+			);
+		} catch (Exception $e) {
+			return array(
+	            'msg' => $e->getMessage()
+	        );
+		}
+	}
 	//App Nueva
 	public function getServerApp(Request $request)
 	{

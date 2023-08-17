@@ -29,6 +29,12 @@ class Server extends Model
         return $this->select('id', 'title as name', 'position', 'embed')	
 			->get();
     }
+    
+    public function getServersList2()
+    {
+        return $this->select('id', 'title as name', 'position', 'embed', 'status')	
+			->get();
+    }
 
     //App Nueva
     public function getServerApp($request) 

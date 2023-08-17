@@ -85,7 +85,7 @@ class Episode extends Model
         return $this->cacheFor(now()->addHours(24))
             ->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt', 'views as visitas')
             ->where('id', '>=', 19529)
-            ->where('id', '<=', 20656)
+            ->where('id', '<=', 20691)
 		    ->orderby('episodes.id','desc')
 			->get();
     }
@@ -95,7 +95,7 @@ class Episode extends Model
         return $this->cacheFor(now()->addHours(24))
             ->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt', 'views as visitas')
             ->where('id', '>=', 20231)
-            ->where('id', '<=', 20656)
+            ->where('id', '<=', 20691)
             ->orderby('episodes.id','desc')
 			->get();
     }
@@ -110,12 +110,20 @@ class Episode extends Model
 			->get();
     }
 
+    public function getEpisodesList2()
+    {
+        return $this->cacheFor(now()->addHours(1))
+            ->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt')
+            ->orderby('episodes.id','desc')
+			->get();
+    }
+
     public function getEpisodeList()
     {
         return $this->cacheFor(now()->addHours(24))
             ->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt', 'views as visitas')
-            ->where('id', '>=', 19529)
-            ->where('id', '<=', 20648)
+            ->where('id', '>=', 20662)
+            ->where('id', '<=', 20662)
 		    ->orderby('episodes.id','desc')
 			->get();
     }

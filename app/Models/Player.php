@@ -79,13 +79,13 @@ class Player extends Model
 			->select('players.id', 'code as link', 'languaje', 'server_id as serverId', 'episode_id as episodeId')
 			->leftJoin('servers','servers.id','=','players.server_id')
 			->where('episode_id', '>=', 19529)
-			->where('episode_id', '<=', 20656)	
+			->where('episode_id', '<=', 20691)	
 			->where(function ($query) {
 				$query->where('status', 1)
 					  ->orWhere('status', 3);
 			})
             ->orwhere('updated_at', '>=', '2023-04-02 00:00:04')
-			->where('episode_id', '<=', 20656)
+			->where('episode_id', '<=', 20691)
 			->where('languaje', '=', 1)
 			->where(function ($query) {
 				$query->where('status', 1)
@@ -102,13 +102,13 @@ class Player extends Model
 			->select('players.id', 'code as link', 'languaje', 'server_id as serverId', 'episode_id as episodeId')
 			->leftJoin('servers','servers.id','=','players.server_id')
 			->where('episode_id', '>=', 20231)
-			->where('episode_id', '<=', 20656)	
+			->where('episode_id', '<=', 20691)	
 			->where(function ($query) {
 				$query->where('server_id', 1)
 					  ->orWhere('server_id', 5);
 			})
 			->orwhere('updated_at', '>=', '2023-07-05 00:00:05')
-			->where('episode_id', '<=', 20656)
+			->where('episode_id', '<=', 20691)
 			->where('languaje', '=', 1)
 			->where(function ($query) {
 				$query->where('server_id', 1)
@@ -124,7 +124,7 @@ class Player extends Model
         return $this->cacheFor(now()->addHours(24))
 			->select('players.id', 'code as link', 'languaje', 'server_id as serverId', 'episode_id as episodeId')
 			->leftJoin('servers','servers.id','=','players.server_id')
-			->where('updated_at', '>=', '2023-07-05 00:00:07')
+			->where('updated_at', '>=', '2023-08-11 17:33:33')
 			->where('episode_id', '<=', 20231)	
 			->where(function ($query) {
 				$query->where('server_id', 1)
@@ -140,7 +140,7 @@ class Player extends Model
         return $this->cacheFor(now()->addHours(1))
 			->select('players.id')
 			->leftJoin('servers','servers.id','=','players.server_id')
-			->where('episode_id', '<=', 20656)
+			->where('episode_id', '<=', 20691)
 			->where(function ($query) {
 				$query->where('status', 1)
 					  ->orWhere('status', 3);
@@ -155,27 +155,42 @@ class Player extends Model
         return $this->cacheFor(now()->addHours(24))
 			->select('players.id', 'code as link', 'languaje', 'server_id as serverId', 'episode_id as episodeId')
 			->leftJoin('servers','servers.id','=','players.server_id')
-			->where('episode_id', '>=', 19529)
-			->where('episode_id', '<=', 20650)	
+			->where('updated_at', '>=', '2023-08-11 17:33:35')
+			->where('episode_id', '<=', 20671)	
 			->where(function ($query) {
-				$query->where('status', 1)
-					  ->orWhere('status', 3);
-			})
-            ->orwhere('updated_at', '>=', '2023-04-02 00:00:04')
-			->where('episode_id', '<=', 20650)
-			->where('languaje', '=', 1)
-			->where(function ($query) {
-				$query->where('status', 1)
-					  ->orWhere('status', 3);
+				$query->where('server_id', 1);
 			})
 			->orderby('episode_id','desc')
 			->orderby('players.id','desc')
 			->get();
     }
+
+	public function getPlayersList2()
+    {
+        return $this->cacheFor(now()->addHours(24))
+			->select('players.id', 'code as link', 'languaje as language', 'server_id as serverId', 'episode_id as episodeId')
+			->leftJoin('servers','servers.id','=','players.server_id')
+			->where('episode_id', '>=', 20231)
+			->where('episode_id', '<=', 20691)	
+			->where(function ($query) {
+				$query->where('server_id', 1);
+			})
+			->orwhere('updated_at', '>=', '2023-07-05 00:00:05')
+			->where('episode_id', '<=', 20691)
+			->where('languaje', '=', 1)
+			->where(function ($query) {
+				$query->where('server_id', 1);
+			})
+			->orderby('episode_id','desc')
+			->orderby('players.id','desc')
+			->get();
+    }
+
 	//App Nueva
 	public function getPlayerApp($request)
 	{
-        return $this->select('players.id', 'title as name', 'code as link', 'embed', 'episode_id', 'number', 'anime_id as animeId')
+        return $this->cacheFor(now()->addHours(24))
+			->select('players.id', 'title as name', 'code as link', 'embed', 'episode_id', 'number', 'anime_id as animeId')
 			->leftJoin('servers','servers.id','=','players.server_id')
 			->leftJoin('episodes', 'episodes.id', '=', 'players.episode_id')
 			->where('players.id', $request->player_id)

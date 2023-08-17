@@ -269,8 +269,16 @@ class Anime extends Model
     {
 		return $this->cacheFor(now()->addHours(12))
 			->select('id', 'name', 'name_alternative as nameAlternative', 'slug', 'banner as imagenCapitulo', 'poster as imagen', 'overview', \DB::raw("Date(aired) as aired"), 'type', 'status', 'genres', 'rating', 'vote_average as voteAverage', 'views_app as visitas')
-			->where('updated_at', '>=', '2023-07-04 16:59:12')
+			->where('id', '>=', 1031)
 			->where('id', '<=', 1031)
+			->orderBy('aired','desc')
+			->get();
+	}
+
+	public function getAnimesList2()
+    {
+		return $this->cacheFor(now()->addHours(1))
+			->select('id', 'name', 'name_alternative as nameAlternative', 'slug', 'banner as imagenCapitulo', 'poster as imagen', 'overview', \DB::raw("Date(aired) as aired"), 'type', 'status', 'genres', 'rating', 'vote_average as voteAverage', 'views_app as visitas')
 			->orderBy('aired','desc')
 			->get();
 	}
@@ -279,7 +287,7 @@ class Anime extends Model
     {
         return $this->cacheFor(now()->addHours(24))
 			->select('id', 'name', 'name_alternative as nameAlternative', 'slug', 'banner as imagenCapitulo', 'poster as imagen', 'overview', \DB::raw("Date(aired) as aired"), 'type', 'status', 'genres', 'rating', 'trailer', 'vote_average as voteAverage', 'views_app as visitas', 'isTopic')
-			->where('id', '>=', 974)
+			->where('id', '>=', 1066)
 			->where('id', '<=', 1066)
 			->orderBy('aired','desc')
 			->get();
