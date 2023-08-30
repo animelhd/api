@@ -36,27 +36,31 @@ class UserController extends Controller
 		try {
 			$name = $request->get('name');
 			$image = $request->get('image');
+			$namev = $this->user->where('name', $name)->first();
 			$userUpdate = User::find($request->user()->id);
-			if(!$userUpdate)
-				throw new Exception("Usuario no encontrado", 1);
-			if($image != $userUpdate->image)	
-				$userUpdate->image = $image;
-			if($name != $userUpdate->name)	
+			if($userUpdate->name != $name) {
+				if($namev) {
+					return array(
+						'code' => 400,
+						'msg' => 'Este Username ya estan en uso'
+					);
+				}
+			} else {
 				$userUpdate->name = $name;
-			$userUpdate->save();
-			return array(
-				'status' => 'OK',
-				'code' => 200,
-				'data' => $userUpdate
-			);
+				$userUpdate->image = $image;
+				$userUpdate->save();
+				return array(
+					'status' => 'OK',
+					'code' => 200,
+					'data' => $userUpdate
+				);
+			}
 		} catch (Exception $error) {
 			return array(
 				'status' => 'Error',
-				'message' => $error->getMessage(),
+				'msg' => $error->getMessage(),
 				'code' => $error->getCode()
 			);
 		}
-		
 	}
-
 }

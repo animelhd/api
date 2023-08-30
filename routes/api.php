@@ -32,9 +32,9 @@ Route::get('/debug', [Tio::class, 'EpisodesImport'])->name('index');
 Route::get('/sitemap', [ApiController::class, 'sitemap'])->name('sitemap');
 
 Route::prefix('app')->name('app.')->group(function () {
-	Route::get('recents', [ApiController::class, 'getRecentApp']);
+	Route::get('recents', [ApiController::class, 'getRecenteApp']);
 	Route::get('newApp', [ApiController::class, 'getNewApp']);
-	Route::get('listApp', [ApiController::class, 'getListApp']);
+	Route::get('listApp', [ApiController::class, 'getListApp2']);
 	Route::get('home', [ApiController::class, 'getDataHome']);
 	Route::middleware(['throttle:app'])->group(function () {
 		//Route::get('anime/list5', [ApiController::class, 'getAnimeList']);
@@ -42,13 +42,43 @@ Route::prefix('app')->name('app.')->group(function () {
 		//Route::get('server/list2', [ApiController::class, 'getServersList']);
 		//Route::get('player/list5', [ApiController::class, 'getPlayerList']);
 	});
+	Route::middleware('appMd')->group(function () {
+		Route::get('recentApp', [ApiController::class, 'getRecentApp']);
+		Route::get('listApp2', [ApiController::class, 'getListApp']);
+		Route::get('lastPlayer', [ApiController::class, 'getLastPlayer']);
+	});
+	// Authenticate User
+	Route::prefix('auth')->name('auth.')->group(function () {
+		Route::post('tokenApp', [ApiController::class, 'getTokenApp']);
+		Route::post('registerApp', [ApiController::class, 'getRegister']);
+		Route::middleware('auth:sanctum')->group(function () {
+			Route::post('update', [UserController::class, 'updateProfile']);
+			Route::get('user', [ApiController::class, 'loginUser']);
+			Route::get('logout', [ApiController::class, 'logoutUser']);
+			Route::prefix('favorite')->group(function () {
+				Route::post('add', [ApiController::class, 'addAnimeFavorite']);
+				Route::post('delete', [ApiController::class, 'deleteAnimeFavorite']);
+				Route::post('list', [ApiController::class, 'listAnimeFavorite']);
+			});
+			Route::prefix('view')->group(function () {
+				Route::post('add', [ApiController::class, 'addAnimeView']);
+				Route::post('delete', [ApiController::class, 'deleteAnimeView']);
+				Route::post('list', [ApiController::class, 'listAnimeView']);
+			});	
+			Route::prefix('watching')->group(function () {
+				Route::post('add', [ApiController::class, 'addAnimeWatching']);
+				Route::post('delete', [ApiController::class, 'deleteAnimeWatching']);
+				Route::post('list', [ApiController::class, 'listAnimeWatching']);
+			});			
+		});
+	});
 	Route::get('anime/{anime_slug}', [ApiController::class, 'getDataAnime']);
 	Route::prefix('server')->name('server.')->group(function () {
 		//Route::get('{anime_id}/{episode_number}/{languaje}', [ApiController::class, 'getServerApp']);
 	});
 	Route::prefix('player')->name('players.')->group(function () {
 		Route::get('lastplayer', [ApiController::class, 'getLastPlayer']);
-		Route::get('{player_id}', [ApiController::class, 'getPlayerApp']);
+		//Route::get('{player_id}', [ApiController::class, 'getPlayerApp']);
 	});
 	Route::get('view-anime/{id}/{episode_id}', [ApiController::class, 'setViewsAnime']);
 	Route::get('view-animes/{id}', [ApiController::class, 'setViewsAnimes']);
@@ -116,13 +146,13 @@ Route::get('version', [ApiController::class, 'version']);
 
 // Authenticate User
 Route::prefix('auth')->name('auth.')->group(function () {
-	Route::post('token', [ApiController::class, 'getTokenLogin']);
+	//Route::post('token', [ApiController::class, 'getTokenLogin']);
 	Route::post('tokenApp', [ApiController::class, 'getTokenApp']);
-    Route::post('register', [RegisteredUserController::class, 'store']);
+    //Route::post('register', [RegisteredUserController::class, 'store']);
 	Route::post('registerApp', [ApiController::class, 'getRegister']);
 	Route::middleware('auth:sanctum')->group(function () {
 		Route::post('update', [UserController::class, 'updateProfile']);
-		Route::get('user', [ApiController::class, 'loginUser']);
+		//Route::get('user', [ApiController::class, 'loginUser']);
 		Route::get('logout', [ApiController::class, 'logoutUser']);
 		Route::prefix('favorite')->group(function () {
 			Route::post('add', [ApiController::class, 'addFavoriteAnime']);

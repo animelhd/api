@@ -497,7 +497,7 @@ class ApiController extends Controller
 	}
 
 	//EndPoints App
-	public function getRecentApp()
+	public function getRecenteApp()
 	{
 		try {
 			return array(
@@ -527,7 +527,7 @@ class ApiController extends Controller
 	        );
 		}
 	}
-	public function getListApp()
+	public function getListApp2()
 	{
 		try {
 			return array(
@@ -535,21 +535,6 @@ class ApiController extends Controller
 			    'episodes' => $this->episode->getEpisodesList(),
 			    'servers' => $this->server->getServersList(),
 			    'players' => $this->player->getPlayersList()
-			);
-		} catch (Exception $e) {
-			return array(
-	            'msg' => $e->getMessage()
-	        );
-		}
-	}
-	public function getListApp2()
-	{
-		try {
-			return array(
-			    'animes' => $this->anime->getAnimesList2(),
-			    'episodes' => $this->episode->getEpisodesList2(),
-				'servers' => $this->server->getServersList2(),
-			    'players' => $this->player->getPlayersList2()
 			);
 		} catch (Exception $e) {
 			return array(
@@ -745,7 +730,11 @@ class ApiController extends Controller
 
 	public function version(Request $request)
 	{
-		if($request->get('v') == '1.0.2'){
+		if($request->get('v') == '1.0.3'){
+			return array(
+				'status' => true,
+			);
+		}else if($request->get('v') == '1.0.2'){
 			return array(
 				'status' => true,
 			);
@@ -760,5 +749,159 @@ class ApiController extends Controller
 		}
 
 	}
-
+	//Nueva App Tienda y V1.0.3
+	public function getRecentApp()
+	{
+		try {
+			return array(
+			    'animes' => $this->anime->getRecentAnime(),
+			    'episodes' => $this->episode->getRecentEpisodes(),
+			    'servers' => $this->server->getServersList2(),
+			    'players' => $this->player->getRecentPlayers()
+			);
+		} catch (Exception $e) {
+			return array(
+	            'msg' => $e->getMessage()
+	        );
+		}
+	}
+	public function getListApp()
+	{
+		try {
+			return array(
+			    'animes' => $this->anime->getAnimesList2(),
+			    'episodes' => $this->episode->getEpisodesList2(),
+				'servers' => $this->server->getServersList2(),
+			    'players' => $this->player->getPlayersList2()
+			);
+		} catch (Exception $e) {
+			return array(
+	            'msg' => $e->getMessage()
+	        );
+		}
+	}
+	public function addAnimeFavorite(Request $request){
+		try {
+			$user = $this->user::find($request->user_id);
+			$anime = $this->anime::find($request->anime_id);
+			$user->favorite($anime);
+			return array(
+				'code' => 200,
+	            'status' => true
+	        );
+		} catch (Exception $e) {
+			return array(
+	            'code' => 404,
+				'error' => $e->getMessage()
+	        );
+		}		
+	}
+	public function deleteAnimeFavorite(Request $request){
+		try {
+			$user = $this->user::find($request->user_id);
+			$anime = $this->anime::find($request->anime_id);
+			$user->unfavorite($anime);
+			return array(
+				'code' => 200,
+	            'status' => false
+	        );
+		} catch (Exception $e) {
+			return array(
+	            'code' => 404
+	        );
+		}		
+	}
+	public function listAnimeFavorite(Request $request){
+		try {
+			$user = $this->user::find($request->user_id);
+			$data = $user->getFavoriteItems(Anime::class)->cacheFor(now()->addHours(1))->select('id','name','poster')->orderBy('name','asc')->get();
+			return $data;
+		} catch (Exception $e) {
+			return array(
+	            'status' => false
+	        );
+		}		
+	}
+	public function addAnimeView(Request $request){
+		try {
+			$user = $this->user::find($request->user_id);
+			$anime = $this->anime::find($request->anime_id);
+			$user->view($anime);
+			return array(
+				'code' => 200,
+	            'status' => true
+	        );
+		} catch (Exception $e) {
+			return array(
+	            'code' => 404
+	        );
+		}		
+	}
+	public function deleteAnimeView(Request $request){
+		try {
+			$user = $this->user::find($request->user_id);
+			$anime = $this->anime::find($request->anime_id);
+			$user->unview($anime);
+			return array(
+				'code' => 200,
+	            'status' => false
+	        );
+		} catch (Exception $e) {
+			return array(
+	            'code' => 404
+	        );
+		}		
+	}
+	public function listAnimeView(Request $request){
+		try {
+			$user = $this->user::find($request->user_id);
+			$data = $user->getViewItems(Anime::class)->cacheFor(now()->addHours(1))->select('id','name','poster')->orderBy('name','asc')->get();
+			return $data;
+		} catch (Exception $e) {
+			return array(
+	            'status' => false
+	        );
+		}		
+	}
+	public function addAnimeWatching(Request $request){
+		try {
+			$user = $this->user::find($request->user_id);
+			$anime = $this->anime::find($request->anime_id);
+			$user->watching($anime);
+			return array(
+				'code' => 200,
+	            'status' => true
+	        );
+		} catch (Exception $e) {
+			return array(
+	            'code' => 404
+	        );
+		}		
+	}
+	public function deleteAnimeWatching(Request $request){
+		try {
+			$user = $this->user::find($request->user_id);
+			$anime = $this->anime::find($request->anime_id);
+			$user->unwatching($anime);
+			return array(
+				'code' => 200,
+	            'status' => false
+	        );
+		} catch (Exception $e) {
+			return array(
+	            'code' => 404
+	        );
+		}		
+	}
+	public function listAnimeWatching(Request $request){
+		try {
+			$user = $this->user::find($request->user_id);
+			$data = $user->getWatchingItems(Anime::class)->cacheFor(now()->addHours(1))->select('id','name','poster')->orderBy('name','asc')->get();
+			return $data;
+		} catch (Exception $e) {
+			return array(
+	            'status' => false
+	        );
+		}		
+	}
 }

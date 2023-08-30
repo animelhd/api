@@ -333,7 +333,7 @@ class Tio extends Controller
             $links = $this->getLinksFromURL($server, $client, $url);
             if ($links && isset($links[0])) {
                 if (strtolower($server) === "voe") {
-                    $links[0] = $links[0] . "/$anime-$i.mp4";
+                    $links[0] = $links[0];
                 }
             } else {
                 throw new Exception("No se ha encontrado links para el servidor", 2);

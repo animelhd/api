@@ -56,7 +56,8 @@ class Episode extends Model
 	
 	public function getInfoEpisodePage($request, $anime)
     {
-        return $this->select('id','number','views')
+        return $this
+            ->select('id','number','views')
 		    ->where('anime_id',$anime->id)
 			->where('number',$request->episode_number)
 			->first();
@@ -85,7 +86,7 @@ class Episode extends Model
         return $this->cacheFor(now()->addHours(24))
             ->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt', 'views as visitas')
             ->where('id', '>=', 19529)
-            ->where('id', '<=', 20691)
+            ->where('id', '<=', 20791)
 		    ->orderby('episodes.id','desc')
 			->get();
     }
@@ -95,7 +96,7 @@ class Episode extends Model
         return $this->cacheFor(now()->addHours(24))
             ->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt', 'views as visitas')
             ->where('id', '>=', 20231)
-            ->where('id', '<=', 20691)
+            ->where('id', '<=', 20791)
             ->orderby('episodes.id','desc')
 			->get();
     }
@@ -110,20 +111,32 @@ class Episode extends Model
 			->get();
     }
 
-    public function getEpisodesList2()
-    {
-        return $this->cacheFor(now()->addHours(1))
-            ->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt')
-            ->orderby('episodes.id','desc')
-			->get();
-    }
-
     public function getEpisodeList()
     {
         return $this->cacheFor(now()->addHours(24))
             ->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt', 'views as visitas')
             ->where('id', '>=', 20662)
             ->where('id', '<=', 20662)
+		    ->orderby('episodes.id','desc')
+			->get();
+    }
+
+    public function getRecentEpisodes()
+    {
+        return $this->cacheFor(now()->addHours(12))
+            ->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt')
+            ->where('id', '>=', 20730)
+            ->where('id', '<=', 20791)
+		    ->orderby('episodes.id','desc')
+			->get();
+    }
+
+    public function getEpisodesList2()
+    {
+        return $this
+            ->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt')
+            ->where('id', '>=', 20730)
+            ->where('id', '<=', 20736)
 		    ->orderby('episodes.id','desc')
 			->get();
     }
