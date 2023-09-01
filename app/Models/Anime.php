@@ -153,7 +153,7 @@ class Anime extends Model
 	
 	public function getAnimePage($request)
     {
-        return $this->cacheFor(now()->addHours(24))
+        return $this
 			->select(['animes.*',
 				\DB::raw("IFNULL(sum(episodes.views),0) as totalviews")
 			])
@@ -173,7 +173,7 @@ class Anime extends Model
 
 	public function getAnimeInfoPage($request)
     {
-        return $this->cacheFor(now()->addHours(24))
+        return $this
 			->where('slug',$request->anime_slug)			
 			->first();
     }
@@ -188,7 +188,7 @@ class Anime extends Model
 
 	public function getAnimeId($request)
     {
-        return $this->cacheFor(now()->addHours(2))
+        return $this
 			->select('animes.id', \DB::raw("sum(episodes.views_app) as totalviews"))
 			->leftJoin('episodes','episodes.anime_id','=','animes.id')
 			->where('animes.id',$request->id)	
@@ -289,7 +289,7 @@ class Anime extends Model
 			->orderBy('aired','desc')
 			->get();
 	}
-	
+	//New App 1.0.3 y Tienda
 	public function getRecentAnime()
     {
         return $this->cacheFor(now()->addHours(12))
@@ -304,7 +304,7 @@ class Anime extends Model
     {
 		return $this
 			->select('id', 'name', 'name_alternative as nameAlternative', 'banner as imagenCapitulo', 'poster as imagen', 'overview', 'aired', 'type', 'status', 'genres', 'rating', 'vote_average as voteAverage', 'views_app as visitas')
-			->where('updated_at', '>=', '2023-08-11 17:33:35')
+			->where('updated_at', '>=', '2023-08-31 17:33:35')
 			->where('id', '<=', 1068)
 			->orderBy('aired','desc')
 			->get();

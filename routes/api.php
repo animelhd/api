@@ -51,7 +51,8 @@ Route::prefix('app')->name('app.')->group(function () {
 	Route::prefix('auth')->name('auth.')->group(function () {
 		Route::post('tokenApp', [ApiController::class, 'getTokenApp']);
 		Route::post('registerApp', [ApiController::class, 'getRegister']);
-		Route::middleware('auth:sanctum')->group(function () {
+		Route::post('forgotPassword', [ApiController::class, 'forgotPassword']);
+		Route::middleware('appsanctum')->group(function () {
 			Route::post('update', [UserController::class, 'updateProfile']);
 			Route::get('user', [ApiController::class, 'loginUser']);
 			Route::get('logout', [ApiController::class, 'logoutUser']);

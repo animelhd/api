@@ -44,8 +44,8 @@ class Episode extends Model
 	
 	public function getReleases()
     {
-        return $this->select('id','anime_id','number','created_at','views')
-            //->whereDate('created_at', '>=', Carbon::today()->subDays(7))
+        return $this
+            ->select('id','anime_id','number','created_at','views')
 			->limit(24)
 			->with(['anime' => function ($q) {
 				$q->select('id','name','slug','poster','banner');
@@ -86,7 +86,7 @@ class Episode extends Model
         return $this->cacheFor(now()->addHours(24))
             ->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt', 'views as visitas')
             ->where('id', '>=', 19529)
-            ->where('id', '<=', 20791)
+            ->where('id', '<=', 20809)
 		    ->orderby('episodes.id','desc')
 			->get();
     }
@@ -96,7 +96,7 @@ class Episode extends Model
         return $this->cacheFor(now()->addHours(24))
             ->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt', 'views as visitas')
             ->where('id', '>=', 20231)
-            ->where('id', '<=', 20791)
+            ->where('id', '<=', 20809)
             ->orderby('episodes.id','desc')
 			->get();
     }
@@ -120,13 +120,13 @@ class Episode extends Model
 		    ->orderby('episodes.id','desc')
 			->get();
     }
-
+    //New App 1.0.3 y Tienda
     public function getRecentEpisodes()
     {
         return $this->cacheFor(now()->addHours(12))
             ->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt')
-            ->where('id', '>=', 20730)
-            ->where('id', '<=', 20791)
+            ->where('id', '>=', 20804)
+            ->where('id', '<=', 20809)
 		    ->orderby('episodes.id','desc')
 			->get();
     }
@@ -135,8 +135,8 @@ class Episode extends Model
     {
         return $this
             ->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt')
-            ->where('id', '>=', 20730)
-            ->where('id', '<=', 20736)
+            ->where('updated_at', '>=', '2023-08-31 17:33:35')
+            ->where('id', '<=', 20809)
 		    ->orderby('episodes.id','desc')
 			->get();
     }

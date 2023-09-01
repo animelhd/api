@@ -155,5 +155,22 @@ class User extends Authenticatable
     {
         return $request->user()->currentAccessToken()->delete();
     }
+    
+    public function forgotPassword($request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users',
+            'password' => 'required|string|min:7',
+            'password_confirmation' => 'required'
+        ]);
+
+        $user = User::where('email', $request->email)
+        ->update(['password' => Hash::make($request->password)]);
+        
+        return array(
+            'code' => 200,
+            'msg' => 'Registro Exitoso'
+        );
+     }
 
 }

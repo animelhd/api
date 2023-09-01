@@ -44,6 +44,15 @@ class UserController extends Controller
 						'code' => 400,
 						'msg' => 'Este Username ya estan en uso'
 					);
+				} else {
+					$userUpdate->name = $name;
+					$userUpdate->image = $image;
+					$userUpdate->save();
+					return array(
+						'status' => 'OK',
+						'code' => 200,
+						'data' => $userUpdate
+					);					
 				}
 			} else {
 				$userUpdate->name = $name;

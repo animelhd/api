@@ -363,6 +363,16 @@ class ApiController extends Controller
 		}		
 	}
 
+	public function forgotPassword(Request $request){
+		try {
+			return $this->user->forgotPassword($request);
+		} catch (Exception $e) {
+			return array(
+	            'msg' => $e->getMessage()
+	        );
+		}		
+	}
+
 	public function addFavoriteAnime(Request $request){
 		try {
 			$user = $this->user::find($request->user_id);
