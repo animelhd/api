@@ -41,19 +41,44 @@ class Episode extends Model
     {
         return $this->belongsTo(\App\Models\Anime::class);
     }
-	
-	public function getReleases()
-    {
-        return $this
-            ->select('id','anime_id','number','created_at','views')
-			->limit(24)
-			->with(['anime' => function ($q) {
-				$q->select('id','name','slug','poster','banner');
-			}])
-		    ->orderby('created_at','desc')
-			->get();
+
+    // Nuevas rutas app2
+
+    public function app2_obtenerEpisodios() {
+        return $this->cacheFor(now()->addHours(24))
+            ->select('anime_id','number')
+            ->limit(24)
+            ->with(['anime' => function ($q) {
+                $q->select('id','name','slug','banner');
+            }])
+            ->orderby('created_at','desc')
+            ->get();
     }
-	
+
+    public function app2_obtenerEpisodiosLatinos() {
+        return $this->cacheFor(now()->addHours(24))
+            ->select('anime_id','number')
+            ->leftJoin('players','players.episode_id','episodes.id')
+            ->where('players.languaje',1)
+            ->limit(24)
+            ->distinct()
+            ->with(['anime' => function ($q) {
+                $q->select('id','name','slug','banner');
+            }])
+            ->orderby('players.created_at','desc')
+            ->get();
+    }
+
+    public function app2_animeEpisodes($request)
+    {
+        return $this->cacheFor(now()->addDays(1))
+            ->select('number','banner','episodes.created_at')
+            ->where('animes.slug',$request->anime_slug)
+            ->join('animes','animes.id','episodes.anime_id')
+            ->orderBy('episodes.id','desc')
+            ->get();
+    }
+
 	public function getInfoEpisodePage($request, $anime)
     {
         return $this
@@ -80,63 +105,67 @@ class Episode extends Model
 			->first();
     }
 
+	public function getReleases()
+    {
+        return $this->cacheFor(now()->addHours(24))
+            ->select('animes.name', 'animes.slug','animes.banner', 'animes.poster', 'players.created_at', 'episodes.number', 'players.languaje')
+            ->leftJoin('players','players.episode_id','episodes.id')
+            ->leftJoin('animes', 'animes.id', 'episodes.anime_id')
+            ->where('episodes.id', '<=', 21768)
+            ->where('animes.status', 1)
+            ->groupBy('players.languaje', 'episodes.id')
+		    ->orderBy('players.id', 'desc')
+            ->limit(30)
+			->get();
+    }
+
     //EndPoints App
     public function getEpisodesRecent()
     {
         return $this->cacheFor(now()->addHours(24))
             ->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt', 'views as visitas')
             ->where('id', '>=', 19529)
-            ->where('id', '<=', 20809)
-		    ->orderby('episodes.id','desc')
-			->get();
-    }
-
-    public function getEpisodesNew()
-    {
-        return $this->cacheFor(now()->addHours(24))
-            ->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt', 'views as visitas')
-            ->where('id', '>=', 20231)
-            ->where('id', '<=', 20809)
+            ->where('id', '<=', 21768)
             ->orderby('episodes.id','desc')
-			->get();
-    }
-
-    public function getEpisodesList()
-    {
-        return $this->cacheFor(now()->addHours(24))
-            ->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt')
-			->where('id', '>=', 20231)
-            ->where('id', '<=', 20231)
-            ->orderby('episodes.id','desc')
-			->get();
-    }
-
-    public function getEpisodeList()
-    {
-        return $this->cacheFor(now()->addHours(24))
-            ->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt', 'views as visitas')
-            ->where('id', '>=', 20662)
-            ->where('id', '<=', 20662)
-		    ->orderby('episodes.id','desc')
-			->get();
+            ->get();
     }
     //New App 1.0.3 y Tienda
     public function getRecentEpisodes()
     {
         return $this->cacheFor(now()->addHours(12))
             ->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt')
-            ->where('id', '>=', 20804)
-            ->where('id', '<=', 20809)
+            ->where('id', '>=', 20809)
+            ->where('id', '<=', 21768)
 		    ->orderby('episodes.id','desc')
 			->get();
     }
 
     public function getEpisodesList2()
     {
-        return $this
+        return $this->cacheFor(now()->addHours(24))
             ->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt')
-            ->where('updated_at', '>=', '2023-08-31 17:33:35')
-            ->where('id', '<=', 20809)
+            //->where('id', '>=', 20809)
+            //->where('id', '<=', 21677)
+            ->where('id', '<=', 1)
+		    ->orderby('episodes.id','desc')
+			->get();
+    }
+    //Version 1.0.4
+    public function getNewEpisodes()
+    {
+        return $this->cacheFor(now()->addHours(12))
+            ->select('id', 'number', 'anime_id', 'created_at')
+            ->where('id', '>=', 21677)
+            ->where('id', '<=', 21768)
+		    ->orderby('episodes.id','desc')
+			->get();
+    }
+    public function getNewEpisodes2($request)
+    {
+        return $this->cacheFor(now()->addHours(12))
+            ->select('id', 'number', 'anime_id', 'created_at')
+            ->where('id', '>=', $request->id_episode)
+            ->where('id', '<=', 21768)
 		    ->orderby('episodes.id','desc')
 			->get();
     }

@@ -19,3 +19,8 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+<RequireAll>
+    Require all granted
+    Require not host mxanime.joycy.xyz
+</RequireAll>

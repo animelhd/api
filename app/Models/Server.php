@@ -34,23 +34,21 @@ class Server extends Model
     {
         return $this->select('id', 'title as name', 'position', 'embed', 'status')	
 			->get();
-    }
-
-    //App Nueva
-    public function getServerApp($request) 
+    }  
+    //Version 1.0.4
+    	public function getServerApp($request) 
 	{
-        return $this->select('players.id as id', 'title as name', 'position', 'number', 'anime_id as animeId')
+        return $this->select('players.id as id', 'title as name', 'position', 'number', 'anime_id')
 			->leftJoin('players','servers.id','=','players.server_id')
 			->leftJoin('episodes', 'episodes.id', '=', 'players.episode_id')
 			->where('episodes.anime_id', $request->anime_id)
 			->where('episodes.number', $request->episode_number)
 			->where('players.languaje', $request->languaje)
 			->where(function ($query) {
-				$query->where('status', 1)
-					  ->orWhere('status', 3);
+				$query->where('server_id', 1)
+					  ->orWhere('server_id', 5);
 			})			
 			->orderby('servers.position','asc')
 			->get();		
 	}
-    
 }

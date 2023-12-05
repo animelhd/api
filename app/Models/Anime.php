@@ -11,6 +11,8 @@ use Animelhd\AnimesWatching\Traits\Watchingable;
 
 use Rennokki\QueryCache\Traits\QueryCacheable;
 
+use DB;
+
 class Anime extends Model
 {
     use Sluggable;
@@ -67,6 +69,122 @@ class Anime extends Model
             ]
         ];
     }
+
+	// Nuevas rutas app2
+
+	public function app2_animesPopulars()
+    {
+        return $this->cacheFor(now()->addHours(1))
+			->select('name','slug','banner','genres')
+			->orderBy('views','desc')
+			->limit(6)
+			->get();
+    }
+
+	public function app2_animesFinalizados()
+    {
+        return $this->cacheFor(now()->addHours(1))
+			->select('name','slug','poster')
+			->LeftJoin('episodes', 'episodes.anime_id', '=', 'animes.id')
+			->LeftJoin('players','episode_id', '=', 'episodes.id')
+			->where('players.languaje', 0)
+			->where('status', 0)
+			->groupBy('animes.id')
+			->orderBy('animes.id','desc')
+			->limit(14)
+			->get();
+    }
+
+	public function app2_animesRecientes()
+    {
+        return $this->cacheFor(now()->addHours(1))
+			->select('name','slug','poster')
+			->where('status', 0)
+			->orderBy('animes.id','desc')
+			->limit(14)
+			->get();
+    }
+
+	public function app2_animesLatinos()
+    {
+        return $this->cacheFor(now()->addHours(1))
+			->select('name', 'slug', 'poster', 'vote_average','status',
+		     \DB::raw('MAX(number) as number'),\DB::raw('MAX(players.id) as idplayer'))
+			->LeftJoin('episodes', 'episodes.anime_id', '=', 'animes.id')
+			->LeftJoin('players','episode_id', '=', 'episodes.id')
+			->where('players.languaje', 1)
+			->groupBy('animes.id')
+			->orderBy('idplayer','desc')
+			->limit(14)
+			->get();
+    }
+
+	public function app2_getAnimeInfoPage($request)
+    {
+        return $this->where('slug',$request->anime_slug)->first();
+    }
+
+	public function app2_getRecommendations($anime)
+    {
+		$first_name = explode(' ',trim($anime->name));
+		$first_name = $first_name[0];
+
+		$genres = explode(',',trim($anime->genres));
+		$first_genre = '';
+		$second_genre = '';
+
+		if(count($genres) >= 2){
+			$randoms = array_rand($genres, 2);
+			$first_genre = $genres[$randoms[0]];
+			$second_genre = $genres[$randoms[1]];
+		}
+
+        return $this->select('name','slug','banner')
+			->where('genres','LIKE',"%{$first_genre}%")
+			->where('genres','LIKE',"%{$second_genre}%")
+			->where('slug','!=',$anime->slug)
+			->limit(10)
+			->inRandomOrder()
+			->get();
+    }
+
+	public function app2_animesSearch($request)
+    {
+		return $this->select('name', 'slug', 'poster')
+			->orderBy('name')
+			->where('name','LIKE',"%{$request->search}%")
+			->orwhere('name_alternative','LIKE',"%{$request->search}%")
+			->orwhere('overview','LIKE',"%{$request->search}%")
+			->limit(24)
+			->get();
+    }
+
+	public function app2_getListAnimes($request)
+    {
+        $data = $this
+			->select('name', 'slug', 'poster', 'aired')
+			->orderBy('aired','desc');
+		if($request->type){
+			if($request->type != 'all')
+				$data = $data->where('type',$request->type);
+		}
+		if(isset($request->status)){
+			$data = $data->where('status',$request->status);
+		}
+		if($request->year){
+			if(is_numeric($request->year)){
+				$data = $data->whereYear('aired',$request->year);
+			}
+		}
+		if($request->genre){
+			if($request->genre != 'all')
+				$data = $data->where('genres','LIKE',"%{$request->genre}%");
+		}
+		$data = $data->simplePaginate(28);
+		return $data;
+    }
+	
+
 	
 	public function getBeingWatched()
     {
@@ -91,16 +209,19 @@ class Anime extends Model
 
 	public function getAnimesLatino()
     {
-        return $this->cacheFor(now()->addHours(1))
+        return $this->cacheFor(now()->addHours(12))
 			->select('name', 'slug', 'poster', 'vote_average','status',
 		     \DB::raw('MAX(number) as number'),\DB::raw('MAX(players.id) as idplayer'))
 			->LeftJoin('episodes', 'episodes.anime_id', '=', 'animes.id')
 			->LeftJoin('players','episode_id', '=', 'episodes.id')
+			->where('episodes.id', '<=', 21768)
 			->where('players.languaje', '=', 1)
 			->groupBy('animes.id')
 			->orderBy('idplayer','desc')
 			->get();
     }
+
+
 	public function getListAnimes($request)
     {
         $data = $this->select('name', 'slug', 'poster', 'aired', 'vote_average')
@@ -251,61 +372,51 @@ class Anime extends Model
 	
 	//EndPoints App
 	public function getAnimesRecent()
-    {
-        return $this->cacheFor(now()->addHours(24))
+	{
+		return $this->cacheFor(now()->addHours(12))
 			->select('id', 'name', 'name_alternative as nameAlternative', 'slug', 'banner as imagenCapitulo', 'poster as imagen', 'overview', \DB::raw("Date(aired) as aired"), 'type', 'status', 'genres', 'rating', 'trailer', 'vote_average as voteAverage', 'views_app as visitas', 'isTopic')
 			->where('id', '>=', 974)
-			->where('id', '<=', 1068)
-			->orderBy('aired','desc')
-			->get();
-	}
-
-	public function getAnimesNew()
-    {
-		return $this->cacheFor(now()->addHours(12))
-			->select('id', 'name', 'name_alternative as nameAlternative', 'slug', 'banner as imagenCapitulo', 'poster as imagen', 'overview', \DB::raw("Date(aired) as aired"), 'type', 'status', 'genres', 'rating', 'trailer', 'vote_average as voteAverage', 'views_app as visitas', 'isTopic')	
-			->where('id', '>=', 1031)
-			->where('id', '<=', 1068)
-			->orderBy('aired','desc')
-			->get();
-	}
-
-	public function getAnimesList()
-    {
-		return $this->cacheFor(now()->addHours(12))
-			->select('id', 'name', 'name_alternative as nameAlternative', 'slug', 'banner as imagenCapitulo', 'poster as imagen', 'overview', \DB::raw("Date(aired) as aired"), 'type', 'status', 'genres', 'rating', 'vote_average as voteAverage', 'views_app as visitas')
-			->where('id', '>=', 1031)
-			->where('id', '<=', 1031)
-			->orderBy('aired','desc')
-			->get();
-	}
-
-	public function getAnimeList()
-    {
-        return $this->cacheFor(now()->addHours(24))
-			->select('id', 'name', 'name_alternative as nameAlternative', 'slug', 'banner as imagenCapitulo', 'poster as imagen', 'overview', \DB::raw("Date(aired) as aired"), 'type', 'status', 'genres', 'rating', 'trailer', 'vote_average as voteAverage', 'views_app as visitas', 'isTopic')
-			->where('id', '>=', 1066)
-			->where('id', '<=', 1066)
+			->where('id', '<=', 1137)
 			->orderBy('aired','desc')
 			->get();
 	}
 	//New App 1.0.3 y Tienda
 	public function getRecentAnime()
     {
-        return $this->cacheFor(now()->addHours(12))
+        return $this->cacheFor(now()->addHours(4))
 			->select('id', 'name', 'name_alternative as nameAlternative', 'banner as imagenCapitulo', 'poster as imagen', 'overview', 'aired', 'type', 'status', 'genres', 'rating', 'vote_average as voteAverage', 'views_app as visitas')
 			->where('id', '>=', 1068)
-			->where('id', '<=', 1068)
+			->where('id', '<=', 1137)
 			->orderBy('aired','desc')
 			->get();
 	}
 
 	public function getAnimesList2()
     {
-		return $this
+		return $this->cacheFor(now()->addHours(24))
 			->select('id', 'name', 'name_alternative as nameAlternative', 'banner as imagenCapitulo', 'poster as imagen', 'overview', 'aired', 'type', 'status', 'genres', 'rating', 'vote_average as voteAverage', 'views_app as visitas')
-			->where('updated_at', '>=', '2023-08-31 17:33:35')
-			->where('id', '<=', 1068)
+			//->where('updated_at', '>=', '2023-09-01 19:35:35')
+			//->where('id', '<=', 1137)
+			->where('id', '<=', 1)
+			->orderBy('aired','desc')
+			->get();
+	}
+	//Version 1.0.4
+	public function getNewAnimes()
+    {
+        return $this->cacheFor(now()->addHours(4))
+			->select('id', 'name', 'name_alternative', 'banner', 'poster', 'overview', 'aired', 'type', 'status', 'genres', 'rating', 'vote_average', 'views_app as visitas')
+			->where('id', '>=', 1137)
+			->where('id', '<=', 1137)
+			->orderBy('aired','desc')
+			->get();
+	}
+	public function getNewAnimes2($request)
+    {
+        return $this->cacheFor(now()->addHours(4))
+			->select('id', 'name', 'name_alternative', 'banner', 'poster', 'overview', 'aired', 'type', 'status', 'genres', 'rating', 'vote_average', 'views_app as visitas')
+			->where('id', '>=', $request->id_anime)
+			->where('id', '<=', 1137)
 			->orderBy('aired','desc')
 			->get();
 	}

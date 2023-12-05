@@ -41,4 +41,34 @@ class AppController extends Controller
 		$this->user = $user;
 	}
 
+	public function getRecentApp(Request $request)
+	{
+		try {
+			return array(
+			    'animes' => $this->anime->getNewAnimes($request),
+			    'episodes' => $this->episode->getNewEpisodes($request),
+			    'servers' => $this->server->getServersList2($request),
+			    'players' => $this->player->getNewPlayers($request)
+			);
+		} catch (Exception $e) {
+			return array(
+	            'msg' => $e->getMessage()
+	        );
+		}
+	}
+	public function getRecentApp2(Request $request)
+	{
+		try {
+			return array(
+			    'animes' => $this->anime->getNewAnimes2($request),
+			    'episodes' => $this->episode->getNewEpisodes2($request),
+			    'servers' => $this->server->getServersList2($request),
+			    'players' => $this->player->getNewPlayers2($request)
+			);
+		} catch (Exception $e) {
+			return array(
+	            'msg' => $e->getMessage()
+	        );
+		}
+	}
 }

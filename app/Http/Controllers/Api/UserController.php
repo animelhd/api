@@ -37,7 +37,7 @@ class UserController extends Controller
 			$name = $request->get('name');
 			$image = $request->get('image');
 			$namev = $this->user->where('name', $name)->first();
-			$userUpdate = User::find($request->user()->id);
+			$userUpdate = $this->user::find($request->id);
 			if($userUpdate->name != $name) {
 				if($namev) {
 					return array(
@@ -46,7 +46,11 @@ class UserController extends Controller
 					);
 				} else {
 					$userUpdate->name = $name;
-					$userUpdate->image = $image;
+					if($this->validateImage($image) && $image != null) {
+						$userUpdate->image = $image;
+					}else {
+						$userUpdate->image = "https://avatarfiles.alphacoders.com/319/319952.jpg";
+					}
 					$userUpdate->save();
 					return array(
 						'status' => 'OK',
@@ -56,7 +60,11 @@ class UserController extends Controller
 				}
 			} else {
 				$userUpdate->name = $name;
-				$userUpdate->image = $image;
+				if($this->validateImage($image) && $image != null) {
+					$userUpdate->image = $image;
+				}else {
+					$userUpdate->image = "https://avatarfiles.alphacoders.com/319/319952.jpg";
+				}
 				$userUpdate->save();
 				return array(
 					'status' => 'OK',
@@ -68,8 +76,20 @@ class UserController extends Controller
 			return array(
 				'status' => 'Error',
 				'msg' => $error->getMessage(),
-				'code' => $error->getCode()
+				'code' => $error->getCode(),
+				'detailed' => $error->getLine()
 			);
+		}
+	}
+
+
+	public function validateImage($url){
+		$extension = pathinfo($url, PATHINFO_EXTENSION);
+		$extensionesImagen = array("jpg", "jpeg", "png", "gif", "bmp");
+		if (in_array(strtolower($extension), $extensionesImagen)) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 }

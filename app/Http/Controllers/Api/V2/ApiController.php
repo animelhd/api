@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\V2;
 
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
 
 use App\Models\Anime;
 use App\Models\Genre;
@@ -12,6 +14,7 @@ use App\Models\Server;
 use App\Models\User;
 use App\Models\Codigo;
 
+use Illuminate\Validation\ValidationException;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -50,15 +53,22 @@ class ApiController extends Controller
 	public function getDataHome(Request $request)
 	{
 		try {
+			$data = array(
+				'episodes_recents' => $this->episode->app2_obtenerEpisodios(),
+				'animes_populars' => $this->anime->app2_animesPopulars(),
+				'animes_latino' => $this->anime->app2_animesLatinos(),
+				'animes_recents' => $this->anime->app2_animesRecientes(),
+				'animes_finished' => $this->anime->app2_animesFinalizados()
+			);
 			return array(
-				'episodes' => $this->episode->getReleases(),
-				'animeN' => $this->anime->getListAnimes($request),
-				'animeP' => $this->anime->getPopularToday(),
-				'animeV' => $this->anime->getBeingWatched()
+				'status' => true,
+				'data' => $data
 			);
 		} catch (Exception $e) {
 			return array(
-	            'msg' => $e->getMessage()
+				'status' => false,
+	            'msg' => 'Hubo un error inesperado',
+				'error' => $e->getMessage()
 	        );
 		}
 	}
@@ -66,10 +76,17 @@ class ApiController extends Controller
 	public function getDataAnime(Request $request)
 	{
 		try {
-			return $this->anime->getAnimeInfoPage($request);
+			$anime = $this->anime->app2_getAnimeInfoPage($request);
+			return array(
+				'status' => true,
+				'data' => $anime,
+				'recomendations' => $this->anime->app2_getRecommendations($request)
+			);
 		} catch (Exception $e) {
 			return array(
-	            'code' => $e->getMessage()
+				'status' => false,
+	            'msg' => 'Hubo un error inesperado',
+				'error' => $e->getMessage()
 	        );
 		}
 	}
@@ -86,21 +103,74 @@ class ApiController extends Controller
 		}
 	}
 
-	public function releases(Request $request)
+	public function getEpisodesAnime(Request $request)
 	{
 		try {
-			return $this->episode->getReleases();
+			return array(
+				'status' => true,
+				'data' => $this->episode->app2_animeEpisodes($request)
+			);;
 		} catch (Exception $e) {
 			return array(
-	            'msg' => $e->getMessage()
+				'status' => false,
+	            'msg' => 'Hubo un error inesperado',
+				'error' => $e->getMessage()
 	        );
 		}
 	}
 
-	public function releases2(Request $request)
+	public function getAnimesSearch(Request $request)
 	{
 		try {
-			return $this->player->web_getEpisodesReleases();
+			return array(
+				'status' => true,
+				'data' => $this->anime->app2_animesSearch($request)
+			);;
+		} catch (Exception $e) {
+			return array(
+				'status' => false,
+	            'msg' => 'Hubo un error inesperado',
+				'error' => $e->getMessage()
+	        );
+		}
+	}
+
+	public function getAnimesList(Request $request)
+	{
+		try {
+			return array(
+				'status' => true,
+				'data' => $this->anime->app2_getListAnimes($request)
+			);;
+		} catch (Exception $e) {
+			return array(
+				'status' => false,
+	            'msg' => 'Hubo un error inesperado',
+				'error' => $e->getMessage()
+	        );
+		}
+	}
+
+	public function getPlayersEpisode(Request $request)
+	{
+		try {
+			return array(
+				'status' => true,
+				'data' => $this->player->app2_getPlayersEpisode($request)
+			);;
+		} catch (Exception $e) {
+			return array(
+				'status' => false,
+	            'msg' => 'Hubo un error inesperado',
+				'error' => $e->getMessage()
+	        );
+		}
+	}
+
+	public function releases(Request $request)
+	{
+		try {
+			return $this->episode->getReleases();
 		} catch (Exception $e) {
 			return array(
 	            'msg' => $e->getMessage()
@@ -880,7 +950,7 @@ class ApiController extends Controller
 	public function listAnimeView(Request $request){
 		try {
 			$user = $this->user::find($request->user_id);
-			$data = $user->getViewItems(Anime::class)->select('id','name','poster')->orderBy('name','asc')->get();
+			$data = $user->getViewItems(Anime::class)->cacheFor(now()->addHours(1))->select('id','name','poster')->orderBy('name','asc')->get();
 			return $data;
 		} catch (Exception $e) {
 			return array(
@@ -921,7 +991,7 @@ class ApiController extends Controller
 	public function listAnimeWatching(Request $request){
 		try {
 			$user = $this->user::find($request->user_id);
-			$data = $user->getWatchingItems(Anime::class)->select('id','name','poster')->orderBy('name','asc')->get();
+			$data = $user->getWatchingItems(Anime::class)->cacheFor(now()->addHours(1))->select('id','name','poster')->orderBy('name','asc')->get();
 			return $data;
 		} catch (Exception $e) {
 			return array(
@@ -929,34 +999,53 @@ class ApiController extends Controller
 	        );
 		}		
 	}
+
+
+
 	public function codePasswordRestore(Request $request){
 		try {
-			$user = User::where('email',$request->email)->first();
-			if(!$user)
-				throw new Exception("Usuario no encontrado",403);
-			$codigo = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-			// $response = Mail::to($user->email)->send(new SendCodeRestorePassword($codigo));
-			if(Codigo::where('user_id',$user->id)->exists()){
-				Codigo::where('user_id',$user->id)->delete();
-			}
-			$sendCode = new Codigo([
-				'codigo' => $codigo,
-				'user_id' => $user->id,
-				'expires_at' => now()->addMinutes(30)
+			$validated = $request->validate([
+				'email' => 'required|email|exists:users,email'
+			], [
+				'email.exists' => 'El correo electrónico no se encuentra en nuestros registros'
 			]);
-			$sendCode->save();
-			$data = array(
-				'status'=> 'success',
-				'message' => 'El codigo ha sido enviado con éxito',
-				'user' => $user->id,
-				'email' => $user->email
-			);
-			return $data;
+			$user = User::where('email',$request->email)->first();
+
+			$codigoExistente = Codigo::where('user_id',$user->id)->first();
+
+			if ($codigoExistente && now() < Carbon::Parse($codigoExistente->created_at)->addMinutes(5)) {
+				throw new Exception("Ya se envió un código al correo electrónico o espera un momento para generar otro.", 401);
+			}else {
+				$codigo = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+				$response = Mail::to($user->email)->send(new SendCodeRestorePassword($codigo));
+				if($codigoExistente){
+					$codigoExistente->delete();
+				}
+				$sendCode = new Codigo([
+					'codigo' => $codigo,
+					'user_id' => $user->id,
+					'expires_at' => now()->addMinutes(30)
+				]);
+				$sendCode->save();
+				$data = array(
+					'status'=> true,
+					'message' => 'El codigo ha sido enviado con éxito',
+					'user_id' => $user->id,
+					'user_email' => $user->email,
+				);
+				return response()->json($data, 200);
+			}
+		} catch (ValidationException $exception) {
+			return response()->json([
+				'status' => false,
+				'message'	=> 'Error',
+				'errors' => $exception->errors(),
+			], 422);
 		} catch (Exception $e) {
-			return array(
-	            'status' => 'error',
+			return response()->json(array(
+	            'status' => false,
 				'message' => $e->getMessage()
-	        );
+	        ));
 		}		
 	}
 
@@ -966,9 +1055,12 @@ class ApiController extends Controller
 
 			$request->validate([
 				'user_id' => 'required|exists:users,id',
+				'user_email' => 'required|email|exists:users,email',
 				'code' => 'required|numeric|digits:6',
-				'email' => 'required|email',
 				'password' => 'required|confirmed|min:8',
+			], [
+				'user_id.exists' => 'El usuario no se encuentra en nuestros registros',
+				'user_email.exists' => 'El correo electrónico no se encuentra en nuestros registros',
 			]);
 
 			$userCode = Codigo::where('user_id',$request->user_id)->where('codigo',$request->code)->first();
@@ -977,17 +1069,29 @@ class ApiController extends Controller
 				throw new Exception("El codigo ingresado no es correcto", 403);
 
 			if($userCode->expires_at < now())	
-				throw new Exception("El codigo ingresado no es correcto", 403);
+				throw new Exception("El codigo ha expirado", 403);
 			
-			return $this->user->forgotPassword($request);
-			
-			return $data;
+			$user = User::where('email', $request->user_email)->update(['password' => Hash::make($request->password)]);
+
+			$userCode->delete();
+
+			$data = array(
+				'status'=> true,
+				'message' => 'Se ha actualizado tu contraseña con exito'
+			);
+
+			return response()->json($data, 200);
+
+		}catch (ValidationException $exception) {
+			return response()->json([
+				'status' => false,
+				'message'    => 'Error',
+				'errors' => $exception->errors(),
+			], 422);
 		} catch (Exception $e) {
-			
 			return array(
-	            'status' => 'error',
-				'message' => $e->getMessage(),
-				'detailed' => $e->getLine()
+	            'status' => false,
+				'message' => $e->getMessage()
 	        );
 		}		
 	}
