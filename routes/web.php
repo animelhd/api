@@ -94,6 +94,7 @@ Route::get('stream/{id}', [StreamController::class, 'getStream'])->name('stream'
 Route::get('generateVideo/{s}/{code}', [StreamController::class, 'generateVideo'])->name('generateVideo');
 
 Route::get('stream2/{id}', [StreamController::class, 'getStream2'])->name('stream2');
+Route::get('video/{id}', [StreamController::class, 'video'])->name('video');
 
 
 /*

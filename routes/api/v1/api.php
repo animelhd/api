@@ -24,5 +24,5 @@ Route::get('status', function(Request $request){
 });
 
 
-Route::post('codePasswordRestore', [ApiController::class, 'codePasswordRestore']);
-Route::post('passwordRestore', [ApiController::class, 'passwordRestore']);
+//Route::post('codePasswordRestore', [ApiController::class, 'codePasswordRestore']);
+//Route::post('passwordRestore', [ApiController::class, 'passwordRestore']);

@@ -51,36 +51,7 @@ Route::prefix('app')->name('app.')->group(function () {
 		//Route::get('listApp2', [ApiController::class, 'getListApp']);
 		Route::get('lastPlayer', [ApiController::class, 'getLastPlayer']);
 	});
-	// Authenticate User
-	Route::prefix('auth')->name('auth.')->group(function () {
-		Route::post('tokenApp', [ApiController::class, 'getTokenApp']);
-		Route::post('codePasswordRestore', [ApiController::class, 'codePasswordRestore']);
-		Route::post('passwordRestore', [ApiController::class, 'passwordRestore']);
-		Route::post('registerApp', [ApiController::class, 'getRegister']);
-		Route::post('forgotPassword', [ApiController::class, 'forgotPassword']);
-		Route::middleware('auth:sanctum')->group(function () {
-			Route::get('logout', [ApiController::class, 'logoutUser']);
-		});
-		Route::middleware('appsanctum')->group(function () {
-			Route::post('update', [UserController::class, 'updateProfile']);
-			Route::get('user', [ApiController::class, 'loginUser']);
-			Route::prefix('favorite')->group(function () {
-				Route::post('add', [ApiController::class, 'addAnimeFavorite']);
-				Route::post('delete', [ApiController::class, 'deleteAnimeFavorite']);
-				Route::post('list', [ApiController::class, 'listAnimeFavorite']);
-			});
-			Route::prefix('view')->group(function () {
-				Route::post('add', [ApiController::class, 'addAnimeView']);
-				Route::post('delete', [ApiController::class, 'deleteAnimeView']);
-				Route::post('list', [ApiController::class, 'listAnimeView']);
-			});	
-			Route::prefix('watching')->group(function () {
-				Route::post('add', [ApiController::class, 'addAnimeWatching']);
-				Route::post('delete', [ApiController::class, 'deleteAnimeWatching']);
-				Route::post('list', [ApiController::class, 'listAnimeWatching']);
-			});			
-		});
-	});
+
 	Route::get('anime/{anime_slug}', [ApiController::class, 'getDataAnime']);
 	Route::prefix('server')->name('server.')->group(function () {
 		Route::get('{anime_id}/{episode_number}/{languaje}', [ApiController::class, 'getServerApp']);
@@ -150,33 +121,7 @@ Route::prefix('web/v1')->group(function () {
 	// Route::fallback(function () {return redirect('404');});
 });
 
-// Authenticate User
-Route::prefix('auth')->name('auth.')->group(function () {
-	//Route::post('token', [ApiController::class, 'getTokenLogin']);
-	Route::post('tokenApp', [ApiController::class, 'getTokenApp']);
-    //Route::post('register', [RegisteredUserController::class, 'store']);
-	Route::post('registerApp', [ApiController::class, 'getRegister']);
-	Route::middleware('auth:sanctum')->group(function () {
-		Route::post('update', [UserController::class, 'updateProfile']);
-		//Route::get('user', [ApiController::class, 'loginUser']);
-		Route::get('logout', [ApiController::class, 'logoutUser']);
-		Route::prefix('favorite')->group(function () {
-			Route::post('add', [ApiController::class, 'addFavoriteAnime']);
-			Route::post('delete', [ApiController::class, 'deleteFavoriteAnime']);
-			Route::post('list', [ApiController::class, 'listFavoriteAnime']);
-		});
-		Route::prefix('view')->group(function () {
-			Route::post('add', [ApiController::class, 'addViewAnime']);
-			Route::post('delete', [ApiController::class, 'deleteViewAnime']);
-			Route::post('list', [ApiController::class, 'listViewAnime']);
-		});	
-		Route::prefix('watching')->group(function () {
-			Route::post('add', [ApiController::class, 'addWatchingAnime']);
-			Route::post('delete', [ApiController::class, 'deleteWatchingAnime']);
-			Route::post('list', [ApiController::class, 'listWatchingAnime']);
-		});			
-	});
-});
+
 
 
 // Authenticate User
