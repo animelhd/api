@@ -111,7 +111,7 @@ class Episode extends Model
             ->select('animes.name', 'animes.slug','animes.banner', 'animes.poster', 'players.created_at', 'episodes.number', 'players.languaje')
             ->leftJoin('players','players.episode_id','episodes.id')
             ->leftJoin('animes', 'animes.id', 'episodes.anime_id')
-            ->where('episodes.id', '<=', 21768)
+            ->where('episodes.id', '<=', 21844)
             ->where('animes.status', 1)
             ->groupBy('players.languaje', 'episodes.id')
 		    ->orderBy('players.id', 'desc')
@@ -125,7 +125,7 @@ class Episode extends Model
         return $this->cacheFor(now()->addHours(24))
             ->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt', 'views as visitas')
             ->where('id', '>=', 19529)
-            ->where('id', '<=', 21768)
+            ->where('id', '<=', 21844)
             ->orderby('episodes.id','desc')
             ->get();
     }
@@ -135,7 +135,7 @@ class Episode extends Model
         return $this->cacheFor(now()->addHours(12))
             ->select('id', 'number', 'anime_id as animeId', 'created_at as createdAt')
             ->where('id', '>=', 20809)
-            ->where('id', '<=', 21768)
+            ->where('id', '<=', 21844)
 		    ->orderby('episodes.id','desc')
 			->get();
     }
@@ -156,7 +156,7 @@ class Episode extends Model
         return $this->cacheFor(now()->addHours(12))
             ->select('id', 'number', 'anime_id', 'created_at')
             ->where('id', '>=', 21677)
-            ->where('id', '<=', 21768)
+            ->where('id', '<=', 21844)
 		    ->orderby('episodes.id','desc')
 			->get();
     }

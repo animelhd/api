@@ -214,7 +214,7 @@ class Anime extends Model
 		     \DB::raw('MAX(number) as number'),\DB::raw('MAX(players.id) as idplayer'))
 			->LeftJoin('episodes', 'episodes.anime_id', '=', 'animes.id')
 			->LeftJoin('players','episode_id', '=', 'episodes.id')
-			->where('episodes.id', '<=', 21768)
+			->where('episodes.id', '<=', 21844)
 			->where('players.languaje', '=', 1)
 			->groupBy('animes.id')
 			->orderBy('idplayer','desc')

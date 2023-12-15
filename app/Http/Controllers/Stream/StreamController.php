@@ -60,6 +60,43 @@ class StreamController extends Controller
 		
 	}
 
+
+    public function video(Request $request)
+	{
+        try {
+            $player = Player::where('id',$request->id)->with('server')->first();
+            if(!$player)
+                throw new Exception('No encontrado');
+
+            switch ($player->server->type) {
+                case '0':
+                    $data = ['player' => $player];
+                    return view('stream.video')->with($data);
+                    break;
+                case '1':
+                    return redirect($player->code);
+                    break;
+                case '2':
+                    if(strtolower($player->server->title) ==  "gamma")
+                        {
+                            $idVoe = explode("/",$player->code);
+                            $idVoe = $idVoe[4];
+                            $player->code = $player->server->embed."e/".$idVoe;
+                        }
+                    dd($player->code);    
+                    return redirect($player->code);
+                    break;
+                default:
+                    return redirect($player->code);
+                    break;
+            }
+            
+        } catch (\Exception $e) {
+            abort(403);
+        }
+		
+	}
+
     public function getStream2(Request $request)
 	{
         try {

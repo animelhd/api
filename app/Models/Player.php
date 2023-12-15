@@ -89,7 +89,7 @@ class Player extends Model
 							$join->on('max_players.episode_id', '=', 'episodes.id');
 						})
 			->whereColumn('max_players.max_player_id', '=', 'players.id')
-			->where('episodes.id', '<=', 21768)
+			->where('episodes.id', '<=', 21844)
 			->where('animes.status', 1)
 			->limit(24)
 			->distinct('episodes.id')
@@ -134,12 +134,12 @@ class Player extends Model
 			->select('players.id', 'code as link', 'languaje', 'server_id as serverId', 'episode_id as episodeId')
 			->leftJoin('servers','servers.id','=','players.server_id')
 			->where('episode_id', '>=', 19529)
-			->where('episode_id', '<=', 21768)	
+			->where('episode_id', '<=', 21844)	
 			->where(function ($query) {
 				$query->where('server_id', 1);
 			})
-            ->orwhere('updated_at', '>=', '2023-04-02 00:00:06')
-			->where('episode_id', '<=', 21768)
+            ->orwhere('updated_at', '>=', '2023-04-02 00:00:08')
+			->where('episode_id', '<=', 21844)
 			->where('languaje', '=', 1)
 			->where(function ($query) {
 				$query->where('server_id', 1);
@@ -153,7 +153,7 @@ class Player extends Model
         return $this->cacheFor(now()->addHours(1))
 			->select('players.id')
 			->leftJoin('servers','servers.id','=','players.server_id')
-			->where('episode_id', '<=', 21768)
+			->where('episode_id', '<=', 21844)
 			->where(function ($query) {
 				$query->where('server_id', 1);
 			})
@@ -168,13 +168,13 @@ class Player extends Model
 			->select('players.id', 'code as link', 'languaje as language', 'server_id as serverId', 'episode_id as episodeId')
 			->leftJoin('servers','servers.id','=','players.server_id')
 			->where('episode_id', '>=', 20809)
-			->where('episode_id', '<=', 21768)
+			->where('episode_id', '<=', 21844)
 			->where(function ($query) {
 				$query->where('server_id', 1)
 					->orWhere('server_id', 5);
 			})
-			->orwhere('created_at', '>=', '2023-09-01 19:35:27')
-			->where('episode_id', '<=', 21768)
+			->orwhere('created_at', '>=', '2023-09-01 19:35:28')
+			->where('episode_id', '<=', 21844)
 			->where('languaje', '=', 1)
 			->where(function ($query) {
 				$query->where('server_id', 1)
@@ -191,7 +191,7 @@ class Player extends Model
 			->leftJoin('servers','servers.id','=','players.server_id')
 			//->where('updated_at', '>=', '2023-09-06 19:35:34')
 			->where('episode_id', '>=', 10000)	
-			->where('episode_id', '<=', 21768)	
+			->where('episode_id', '<=', 21844)	
 			->where(function ($query) {
 				$query->where('server_id', 1)
 					  ->orWhere('server_id', 5);
@@ -205,7 +205,7 @@ class Player extends Model
         return $this->cacheFor(now()->addHours(1))
 			->select('players.id')
 			->leftJoin('servers','servers.id','=','players.server_id')
-			->where('episode_id', '<=', 21768)
+			->where('episode_id', '<=', 21844)
 			->where(function ($query) {
 				$query->where('server_id', 1);
 			})
@@ -220,13 +220,13 @@ class Player extends Model
 			->select('players.id', 'code as link', 'languaje as language', 'server_id', 'episode_id')
 			->leftJoin('servers','servers.id','=','players.server_id')
 			->where('episode_id', '>=', 21677)
-			->where('episode_id', '<=', 21768)
+			->where('episode_id', '<=', 21844)
 			->where(function ($query) {
 				$query->where('server_id', 1)
 					->orWhere('server_id', 5);
 			})
-			->orwhere('created_at', '>=', '2023-09-01 19:35:27')
-			->where('episode_id', '<=', 21768)
+			->orwhere('created_at', '>=', '2023-09-01 19:35:28')
+			->where('episode_id', '<=', 21844)
 			->where('languaje', '=', 1)
 			->where(function ($query) {
 				$query->where('server_id', 1)
@@ -242,12 +242,12 @@ class Player extends Model
 			->select('players.id', 'code as link', 'languaje as language', 'server_id', 'episode_id')
 			->leftJoin('servers','servers.id','=','players.server_id')
 			->where('episode_id', '>=', $request->id_episode)
-			->where('episode_id', '<=', 21768)
+			->where('episode_id', '<=', 21844)
 			->where(function ($query) {
 				$query->where('server_id', 1)
 					->orWhere('server_id', 5);
 			})
-			->orwhere('created_at', '>=', '2023-09-01 19:35:27')
+			->orwhere('created_at', '>=', '2023-09-01 19:35:28')
 			->where('languaje', '=', 1)
 			->where(function ($query) {
 				$query->where('server_id', 1)
